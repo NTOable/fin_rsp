@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Inventory Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Fonts & Icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root {
+--bg: #f6f7fb;
+--surface: #ffffff;
+--text: #1f2937;
+--muted: #6b7280;
+--primary: #2563eb;
+--primary-contrast: #ffffff;
+--accent: #0ea5e9;
+--success: #16a34a;
+--warning: #f59e0b;
+--danger: #dc2626;
+--border: #e5e7eb;
+--sidebar-bg: #0f172a;
+--sidebar-text: #cbd5e1;
+--sidebar-active: #38bdf8;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+margin: 0;
+background: var(--bg);
+color: var(--text);
+font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* Layout */
+.layout {
+display: grid;
+grid-template-columns: 260px 1fr;
+min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+background: var(--sidebar-bg);
+color: var(--sidebar-text);
+display: flex;
+flex-direction: column;
+padding: 24px 16px;
+}
+.brand {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 24px;
+color: #fff;
+font-weight: 700;
+letter-spacing: 0.4px;
+}
+.brand .logo {
+width: 36px; height: 36px; border-radius: 8px;
+background: linear-gradient(135deg, var(--primary), var(--accent));
+display: grid; place-items: center; color: #fff;
+box-shadow: 0 6px 18px rgba(37,99,235,0.35);
+}
+.nav {
+display: grid; gap: 6px;
+}
+.nav a {
+display: flex; align-items: center; gap: 12px;
+color: var(--sidebar-text);
+text-decoration: none;
+padding: 10px 12px;
+border-radius: 8px;
+transition: background 0.2s, color 0.2s;
+}
+.nav a:hover { background: rgba(148,163,184,0.1); color: #fff; }
+.nav a.active { background: rgba(56,189,248,0.15); color: var(--sidebar-active); }
+.sidebar .spacer { flex: 1; }
+.sidebar .footer { font-size: 12px; color: #94a3b8; }
+
+/* Topbar */
+.topbar {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 16px 24px;
+border-bottom: 1px solid var(--border);
+background: var(--surface);
+position: sticky; top: 0; z-index: 10;
+}
+.topbar .title {
+font-weight: 700; font-size: 20px;
+}
+.topbar .actions {
+display: flex; gap: 8px; align-items: center;
+}
+.btn {
+display: inline-flex; align-items: center; gap: 8px;
+padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
+background: #fff; color: var(--text); cursor: pointer;
+transition: box-shadow 0.2s, transform 0.02s;
+}
+.btn.primary {
+background: var(--primary); color: var(--primary-contrast); border-color: var(--primary);
+}
+.btn:active { transform: translateY(1px); }
+.btn:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+
+/* Content */
+.content {
+padding: 24px;
+display: grid;
+gap: 24px;
+}
+
+/* KPI Cards */
+.kpis {
+display: grid;
+grid-template-columns: repeat(4, minmax(0, 1fr));
+gap: 16px;
+}
+.card {
+background: var(--surface);
+border: 1px solid var(--border);
+border-radius: 12px;
+padding: 16px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+.card h4 { margin: 0 0 4px; font-size: 14px; color: var(--muted); font-weight: 600; }
+.card .value { font-size: 24px; font-weight: 700; margin: 6px 0; }
+.card .sub {
+display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px;
+}
+.trend.up { color: var(--success); }
+.trend.down { color: var(--danger); }
+
+/* Filters */
+.filters {
+display: grid; gap: 12px;
+grid-template-columns: 1fr 200px 180px 180px auto;
+align-items: center;
+}
+.input, .select {
+width: 100%;
+padding: 10px 12px;
+border: 1px solid var(--border);
+border-radius: 8px;
+background: #fff;
+color: var(--text);
+}
+.input:focus, .select:focus { outline: 2px solid rgba(37,99,235,0.25); }
+
+/* Grid two columns for charts */
+.grid-2 {
+display: grid;
+grid-template-columns: 1.2fr 1fr;
+gap: 16px;
+}
+
+/* Table */
+.table {
+width: 100%;
+border-collapse: separate;
+border-spacing: 0;
+overflow: hidden;
+border: 1px solid var(--border);
+border-radius: 12px;
+background: var(--surface);
+}
+.table thead th {
+text-align: left; padding: 12px; font-size: 12px; color: var(--muted);
+border-bottom: 1px solid var(--border);
+background: #fafafa;
+}
+.table tbody td {
+padding: 12px; border-bottom: 1px solid var(--border);
+font-size: 14px;
+}
+.table tbody tr:hover { background: #f9fbff; }
+.status {
+display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px;
+border-radius: 999px; font-size: 12px; font-weight: 600;
+}
+.status.ok { background: rgba(22,163,74,0.1); color: var(--success); }
+.status.low { background: rgba(245,158,11,0.1); color: var(--warning); }
+.status.out { background: rgba(220,38,38,0.1); color: var(--danger); }
+
+/* Footer */
+.footer-note {
+font-size: 12px; color: var(--muted);
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+.kpis { grid-template-columns: repeat(2, 1fr); }
+.grid-2 { grid-template-columns: 1fr; }
+.filters { grid-template-columns: 1fr 1fr 1fr; }
+}
+@media (max-width: 768px) {
+.layout { grid-template-columns: 60px 1fr; }
+.brand span { display: none; }
+.nav a span { display: none; }
+.filters { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<!-- Sidebar -->
+<aside class="sidebar">
+<div class="brand">
+<div class="logo"><i class="ti ti-package"></i></div>
+<span>Acme Inventory</span>
+</div>
+<nav class="nav">
+<a href="#" class="active"><i class="ti ti-dashboard"></i><span>Dashboard</span></a>
+<a href="#"><i class="ti ti-box"></i><span>Products</span></a>
+<a href="#"><i class="ti ti-truck-delivery"></i><span>Suppliers</span></a>
+<a href="#"><i class="ti ti-clipboard-check"></i><span>Orders</span></a>
+<a href="#"><i class="ti ti-settings"></i><span>Settings</span></a>
+</nav>
+<div class="spacer"></div>
+<div class="footer">© 2025 Acme Corp</div>
+</aside>
+
+<!-- Main -->
+<main>
+<div class="topbar">
+<div class="title">Inventory dashboard</div>
+<div class="actions">
+<button class="btn" id="btnExport"><i class="ti ti-file-type-csv"></i>Export CSV</button>
+<button class="btn primary" id="btnAdd"><i class="ti ti-plus"></i>Add item</button>
+</div>
+</div>
+
+<div class="content">
+<!-- KPIs -->
+<section class="kpis">
+<div class="card">
+<h4>Total items</h4>
+<div class="value" id="kpiTotalItems">0</div>
+<div class="sub"><span class="trend up"><i class="ti ti-arrow-up-right"></i> +3.2%</span><span>vs last month</span></div>
+</div>
+<div class="card">
+<h4>Total stock units</h4>
+<div class="value" id="kpiTotalUnits">0</div>
+<div class="sub"><span class="trend down"><i class="ti ti-arrow-down-right"></i> -1.1%</span><span>vs last month</span></div>
+</div>
+<div class="card">
+<h4>Stock value</h4>
+<div class="value" id="kpiStockValue">$0</div>
+<div class="sub"><span class="trend up"><i class="ti ti-arrow-up-right"></i> +0.8%</span><span>vs last month</span></div>
+</div>
+<div class="card">
+<h4>Low/out items</h4>
+<div class="value" id="kpiLowOut">0</div>
+<div class="sub"><span>Threshold: 10 units</span></div>
+</div>
+</section>
+
+<!-- Filters -->
+<section class="card">
+<div class="filters">
+<input class="input" id="searchInput" placeholder="Search by name, SKU, supplier..." />
+<select class="select" id="categoryFilter">
+<option value="">All categories</option>
+</select>
+<select class="select" id="statusFilter">
+<option value="">All status</option>
+<option value="ok">In stock</option>
+<option value="low">Low stock</option>
+<option value="out">Out of stock</option>
+</select>
+<select class="select" id="supplierFilter">
+<option value="">All suppliers</option>
+</select>
+<button class="btn" id="resetFilters"><i class="ti ti-x"></i>Reset</button>
+</div>
+</section>
+
+<!-- Charts -->
+<section class="grid-2">
+<div class="card">
+<h4>Category breakdown</h4>
+<canvas id="categoryChart" height="140"></canvas>
+</div>
+<div class="card">
+<h4>Stock status distribution</h4>
+<canvas id="statusChart" height="140"></canvas>
+</div>
+</section>
+
+<section class="grid-2">
+<div class="card">
+<h4>Monthly stock movement</h4>
+<canvas id="movementChart" height="160"></canvas>
+</div>
+<div class="card">
+<h4>Top items by value</h4>
+<canvas id="topValueChart" height="160"></canvas>
+</div>
+</section>
+
+<!-- Table -->
+<section class="card">
+<h4 style="margin-bottom:12px;">Inventory items</h4>
+<table class="table" id="inventoryTable">
+<thead>
+<tr>
+<th><button class="btn" data-sort="sku">SKU</button></th>
+<th><button class="btn" data-sort="name">Name</button></th>
+<th>Category</th>
+<th>Supplier</th>
+<th><button class="btn" data-sort="stock">Stock</button></th>
+<th>Unit price</th>
+<th>Total value</th>
+<th>Status</th>
+<th>Updated</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</section>
+
+<div class="footer-note">Tip: Use the filters and header buttons to sort, search, and export.</div>
+</div>
+</main>
+</div>
+
+<script>
+// --- Sample dataset (replace with real data / API) ---
+const items = [
+{ sku: 'SKU-1001', name: 'Premium Notebook A5', category: 'Stationery', supplier: 'PaperWorks', stock: 320, unitPrice: 3.5, updated: '2025-11-01' },
+{ sku: 'SKU-1002', name: 'Gel Pen 0.5mm', category: 'Stationery', supplier: 'InkFlow', stock: 45, unitPrice: 0.8, updated: '2025-11-06' },
+{ sku: 'SKU-1003', name: 'Wireless Mouse', category: 'Electronics', supplier: 'TechSource', stock: 0, unitPrice: 18.0, updated: '2025-11-03' },
+{ sku: 'SKU-1004', name: 'Keyboard Mechanical', category: 'Electronics', supplier: 'TechSource', stock: 12, unitPrice: 45.0, updated: '2025-11-07' },
+{ sku: 'SKU-1005', name: 'Office Chair Ergonomic', category: 'Furniture', supplier: 'SitWell', stock: 8, unitPrice: 120.0, updated: '2025-11-02' },
+{ sku: 'SKU-1006', name: 'Desk Lamp LED', category: 'Electronics', supplier: 'BrightLite', stock: 110, unitPrice: 22.0, updated: '2025-11-05' },
+{ sku: 'SKU-1007', name: 'Storage Box L', category: 'Supplies', supplier: 'StoreMore', stock: 64, unitPrice: 9.2, updated: '2025-11-04' },
+{ sku: 'SKU-1008', name: 'Packing Tape', category: 'Supplies', supplier: 'BondIt', stock: 510, unitPrice: 1.1, updated: '2025-11-07' },
+{ sku: 'SKU-1009', name: 'Label Printer', category: 'Electronics', supplier: 'PrintMaster', stock: 5, unitPrice: 85.0, updated: '2025-10-29' },
+{ sku: 'SKU-1010', name: 'Filing Cabinet 3-Drawer', category: 'Furniture', supplier: 'CabinetCo', stock: 2, unitPrice: 160.0, updated: '2025-11-02' },
+{ sku: 'SKU-1011', name: 'Stapler Heavy Duty', category: 'Stationery', supplier: 'PaperWorks', stock: 24, unitPrice: 6.5, updated: '2025-11-06' },
+{ sku: 'SKU-1012', name: 'Copy Paper A4 80gsm', category: 'Stationery', supplier: 'PaperWorks', stock: 780, unitPrice: 4.2, updated: '2025-11-07' },
+{ sku: 'SKU-1013', name: 'USB-C Dock', category: 'Electronics', supplier: 'TechSource', stock: 14, unitPrice: 72.0, updated: '2025-11-05' },
+{ sku: 'SKU-1014', name: 'Conference Table', category: 'Furniture', supplier: 'FurniPro', stock: 1, unitPrice: 520.0, updated: '2025-10-28' },
+{ sku: 'SKU-1015', name: 'Whiteboard 90x120', category: 'Supplies', supplier: 'EduTools', stock: 26, unitPrice: 34.0, updated: '2025-11-01' },
+];
+
+const LOW_THRESHOLD = 10;
+
+// --- State ---
+let filtered = [...items];
+let sortBy = null;
+let sortAsc = true;
+
+// --- Elements ---
+const tbody = document.querySelector('#inventoryTable tbody');
+const kpiTotalItems = document.getElementById('kpiTotalItems');
+const kpiTotalUnits = document.getElementById('kpiTotalUnits');
+const kpiStockValue = document.getElementById('kpiStockValue');
+const kpiLowOut = document.getElementById('kpiLowOut');
+
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+const statusFilter = document.getElementById('statusFilter');
+const supplierFilter = document.getElementById('supplierFilter');
+const resetFilters = document.getElementById('resetFilters');
+
+const btnExport = document.getElementById('btnExport');
+const btnAdd = document.getElementById('btnAdd');
+
+// --- Utils ---
+const fmtCurrency = (n) => '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const statusOf = (stock) => stock <= 0 ? 'out' : (stock <= LOW_THRESHOLD ? 'low' : 'ok');
+
+// --- Populate filters ---
+function initFilters() {
+const categories = Array.from(new Set(items.map(i => i.category))).sort();
+const suppliers = Array.from(new Set(items.map(i => i.supplier))).sort();
+categoryFilter.innerHTML = '<option value="">All categories</option>' + categories.map(c => `<option value="${c}">${c}</option>`).join('');
+supplierFilter.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(s => `<option value="${s}">${s}</option>`).join('');
+}
+
+// --- Render table ---
+function renderTable() {
+tbody.innerHTML = '';
+filtered.forEach(item => {
+const tr = document.createElement('tr');
+const totalValue = item.stock * item.unitPrice;
+const st = statusOf(item.stock);
+tr.innerHTML = `
+<td>${item.sku}</td>
+<td>${item.name}</td>
+<td>${item.category}</td>
+<td>${item.supplier}</td>
+<td>${item.stock}</td>
+<td>${fmtCurrency(item.unitPrice)}</td>
+<td>${fmtCurrency(totalValue)}</td>
+<td>
+<span class="status ${st}">
+${st === 'ok' ? '<i class="ti ti-circle-check"></i>' : st === 'low' ? '<i class="ti ti-alert-triangle"></i>' : '<i class="ti ti-circle-off"></i>'}
+${st === 'ok' ? 'In stock' : st === 'low' ? 'Low' : 'Out'}
+</span>
+</td>
+<td>${item.updated}</td>
+`;
+tbody.appendChild(tr);
+});
+}
+
+// --- KPIs ---
+function renderKPIs() {
+const totalItems = filtered.length;
+const totalUnits = filtered.reduce((sum, i) => sum + i.stock, 0);
+const stockValue = filtered.reduce((sum, i) => sum + i.stock * i.unitPrice, 0);
+const lowOut = filtered.filter(i => statusOf(i.stock) !== 'ok').length;
+
+kpiTotalItems.textContent = totalItems.toLocaleString();
+kpiTotalUnits.textContent = totalUnits.toLocaleString();
+kpiStockValue.textContent = fmtCurrency(stockValue);
+kpiLowOut.textContent = lowOut.toLocaleString();
+}
+
+// --- Charts ---
+let categoryChart, statusChart, movementChart, topValueChart;
+
+function buildCategoryData(itemsArr) {
+const map = new Map();
+itemsArr.forEach(i => map.set(i.category, (map.get(i.category) || 0) + i.stock));
+return Array.from(map.entries()).sort((a,b)=>b[1]-a[1]);
+}
+function buildStatusData(itemsArr) {
+const map = { ok: 0, low: 0, out: 0 };
+itemsArr.forEach(i => map[statusOf(i.stock)]++);
+return map;
+}
+function buildTopValue(itemsArr, n = 5) {
+return [...itemsArr]
+.map(i => ({ name: i.name, value: i.stock * i.unitPrice }))
+.sort((a,b)=>b.value-a.value)
+.slice(0, n);
+}
+
+function renderCharts() {
+// Category breakdown
+const catData = buildCategoryData(filtered);
+const catLabels = catData.map(([c]) => c);
+const catValues = catData.map(([,v]) => v);
+
+if (categoryChart) categoryChart.destroy();
+categoryChart = new Chart(document.getElementById('categoryChart'), {
+type: 'bar',
+data: {
+labels: catLabels,
+datasets: [{
+label: 'Stock units',
+data: catValues,
+backgroundColor: '#2563eb'
+}]
+},
+options: {
+responsive: true,
+maintainAspectRatio: false,
+scales: {
+x: { grid: { display: false } },
+y: { beginAtZero: true, grid: { color: '#eee' } }
+},
+plugins: {
+legend: { display: false },
+tooltip: { mode: 'index', intersect: false }
+}
+}
+});
+
+// Status distribution
+const stData = buildStatusData(filtered);
+if (statusChart) statusChart.destroy();
+statusChart = new Chart(document.getElementById('statusChart'), {
+type: 'doughnut',
+data: {
+labels: ['In stock', 'Low', 'Out'],
+datasets: [{
+data: [stData.ok, stData.low, stData.out],
+backgroundColor: ['#16a34a', '#f59e0b', '#dc2626']
+}]
+},
+options: {
+responsive: true,
+maintainAspectRatio: false,
+plugins: {
+legend: { position: 'bottom' }
+},
+cutout: '60%'
+}
+});
+
+// Monthly movement (sample synthetic data)
+const months = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+const received = [420, 500, 380, 460, 520, 430, 480];
+const issued = [360, 450, 410, 390, 500, 420, 470];
+
+if (movementChart) movementChart.destroy();
+movementChart = new Chart(document.getElementById('movementChart'), {
+type: 'line',
+data: {
+labels: months,
+datasets: [
+{ label: 'Received', data: received, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.15)', tension: 0.3, fill: true },
+{ label: 'Issued', data: issued, borderColor: '#0ea5e9', backgroundColor: 'rgba(14,165,233,0.15)', tension: 0.3, fill: true }
+]
+},
+options: {
+responsive: true,
+maintainAspectRatio: false,
+plugins: { legend: { position: 'bottom' } },
+scales: {
+x: { grid: { display: false } },
+y: { beginAtZero: true, grid: { color: '#eee' } }
+}
+}
+});
+
+// Top items by value
+const topItems = buildTopValue(filtered, 6);
+if (topValueChart) topValueChart.destroy();
+topValueChart = new Chart(document.getElementById('topValueChart'), {
+type: 'bar',
+data: {
+labels: topItems.map(t => t.name),
+datasets: [{ label: 'Total value', data: topItems.map(t => t.value), backgroundColor: '#1d4ed8' }]
+},
+options: {
+indexAxis: 'y',
+responsive: true,
+maintainAspectRatio: false,
+plugins: { legend: { display: false } },
+scales: {
+x: { grid: { color: '#eee' } },
+y: { grid: { display: false } }
+}
+}
+});
+}
+
+// --- Filtering and sorting ---
+function applyFilters() {
+const q = searchInput.value.trim().toLowerCase();
+const cat = categoryFilter.value;
+const st = statusFilter.value;
+const sup = supplierFilter.value;
+
+filtered = items.filter(i => {
+const matchesQ = !q || `${i.sku} ${i.name} ${i.supplier}`.toLowerCase().includes(q);
+const matchesCat = !cat || i.category === cat;
+const matchesSup = !sup || i.supplier === sup;
+const matchesSt = !st || statusOf(i.stock) === st;
+return matchesQ && matchesCat && matchesSup && matchesSt;
+});
+
+if (sortBy) {
+filtered.sort((a, b) => {
+let va = a[sortBy], vb = b[sortBy];
+if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+if (va < vb) return sortAsc ? -1 : 1;
+if (va > vb) return sortAsc ? 1 : -1;
+return 0;
+});
+}
+
+renderTable();
+renderKPIs();
+renderCharts();
+}
+
+// --- Events ---
+function bindEvents() {
+searchInput.addEventListener('input', applyFilters);
+categoryFilter.addEventListener('change', applyFilters);
+statusFilter.addEventListener('change', applyFilters);
+supplierFilter.addEventListener('change', applyFilters);
+resetFilters.addEventListener('click', () => {
+searchInput.value = '';
+categoryFilter.value = '';
+statusFilter.value = '';
+supplierFilter.value = '';
+applyFilters();
+});
+
+// Sorting
+document.querySelectorAll('#inventoryTable thead .btn[data-sort]').forEach(btn => {
+btn.addEventListener('click', () => {
+const key = btn.getAttribute('data-sort');
+if (sortBy === key) { sortAsc = !sortAsc; } else { sortBy = key; sortAsc = true; }
+applyFilters();
+});
+});
+
+// Export CSV
+btnExport.addEventListener('click', () => {
+const rows = [
+['SKU','Name','Category','Supplier','Stock','Unit Price','Total Value','Status','Updated'],
+...filtered.map(i => [
+i.sku, i.name, i.category, i.supplier, i.stock, i.unitPrice,
+(i.stock * i.unitPrice).toFixed(2), statusOf(i.stock), i.updated
+])
+];
+const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url; a.download = 'inventory_export.csv';
+document.body.appendChild(a); a.click(); document.body.removeChild(a);
+URL.revokeObjectURL(url);
+});
+
+// Add item (demo)
+btnAdd.addEventListener('click', () => {
+const sku = 'SKU-' + Math.floor(1000 + Math.random()*9000);
+const demo = { sku, name: 'New Item ' + Math.floor(Math.random()*100), category: 'Supplies', supplier: 'DemoSupplier', stock: Math.floor(Math.random()*50), unitPrice: +(Math.random()*50).toFixed(2), updated: new Date().toISOString().slice(0,10) };
+items.push(demo);
+initFilters();
+applyFilters();
+});
+}
+
+// --- Init ---
+initFilters();
+bindEvents();
+applyFilters();
+</script>
+</body>
+</html>
