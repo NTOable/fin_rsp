@@ -214,26 +214,26 @@
     <aside class="sidebar">
         <div class="brand">
             <div class="logo"><i class="ti ti-package"></i></div>
-            <span>Acme Inventory</span>
+            <span>IMS (Inventory Management System)</span>
         </div>
         <nav class="nav">
             <a href="#" class="active"><i class="ti ti-dashboard"></i><span>Dashboard</span></a>
-            <a href="#"><i class="ti ti-box"></i><span>Products</span></a>
-            <a href="#"><i class="ti ti-truck-delivery"></i><span>Suppliers</span></a>
-            <a href="#"><i class="ti ti-clipboard-check"></i><span>Orders</span></a>
+            <a href="#"><i class="ti ti-box"></i><span>Items</span></a>
+<!--            <a href="#"><i class="ti ti-truck-delivery"></i><span>Suppliers</span></a>-->
+<!--            <a href="#"><i class="ti ti-clipboard-check"></i><span>Orders</span></a>-->
             <a href="#"><i class="ti ti-settings"></i><span>Settings</span></a>
         </nav>
         <div class="spacer"></div>
-        <div class="footer">© 2025 Acme Corp</div>
+        <div class="footer">© 2025 CIIT OS Group 3</div>
     </aside>
 
     <!-- Main -->
     <main>
         <div class="topbar">
-            <div class="title">Inventory dashboard</div>
+            <div class="title">Inventory Dashboard</div>
             <div class="actions">
                 <button class="btn" id="btnExport"><i class="ti ti-file-type-csv"></i>Export CSV</button>
-                <button class="btn primary" id="btnAdd"><i class="ti ti-plus"></i>Add item</button>
+                <button class="btn primary" id="btnAdd"><i class="ti ti-plus"></i>Add Item</button>
             </div>
         </div>
 
@@ -241,25 +241,26 @@
             <!-- KPIs -->
             <section class="kpis">
                 <div class="card">
-                    <h4>Total items</h4>
+                    <h4>Total Items</h4>
+<!--                    Add SQL Queries here to retrieve data from Storage table from currently logged-in User via FK user_id  -->
                     <div class="value" id="kpiTotalItems">0</div>
                     <div class="sub"><span class="trend up"><i class="ti ti-arrow-up-right"></i> +3.2%</span><span>vs last month</span></div>
                 </div>
+<!--                <div class="card">-->
+<!--                    <h4>Total stock units</h4>-->
+<!--                    <div class="value" id="kpiTotalUnits">0</div>-->
+<!--                    <div class="sub"><span class="trend down"><i class="ti ti-arrow-down-right"></i> -1.1%</span><span>vs last month</span></div>-->
+<!--                </div>-->
                 <div class="card">
-                    <h4>Total stock units</h4>
-                    <div class="value" id="kpiTotalUnits">0</div>
-                    <div class="sub"><span class="trend down"><i class="ti ti-arrow-down-right"></i> -1.1%</span><span>vs last month</span></div>
-                </div>
-                <div class="card">
-                    <h4>Stock value</h4>
+                    <h4>Inventory Value</h4>
                     <div class="value" id="kpiStockValue">$0</div>
                     <div class="sub"><span class="trend up"><i class="ti ti-arrow-up-right"></i> +0.8%</span><span>vs last month</span></div>
                 </div>
-                <div class="card">
-                    <h4>Low/out items</h4>
-                    <div class="value" id="kpiLowOut">0</div>
-                    <div class="sub"><span>Threshold: 10 units</span></div>
-                </div>
+<!--                <div class="card">-->
+<!--                    <h4>Low/out items</h4>-->
+<!--                    <div class="value" id="kpiLowOut">0</div>-->
+<!--                    <div class="sub"><span>Threshold: 10 units</span></div>-->
+<!--                </div>-->
             </section>
 
             <!-- Filters -->
@@ -267,7 +268,7 @@
                 <div class="filters">
                     <input class="input" id="searchInput" placeholder="Search by name, SKU, supplier..." />
                     <select class="select" id="categoryFilter">
-                        <option value="">All categories</option>
+                        <option value="">All Categories</option>
                     </select>
                     <select class="select" id="statusFilter">
                         <option value="">All status</option>
@@ -330,7 +331,7 @@
         </div>
     </main>
 </div>
-
+<!--For Testing-->
 <script>
     // --- Sample dataset (replace with real data / API) ---
     const items = [
