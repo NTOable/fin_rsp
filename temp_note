@@ -24,3 +24,32 @@ TABLES
         storage_id     INT REFERENCES Storage(storage_id)
         user_id        INT REFERENCES User(user_id)
         created_at     TIMESTAMP DEFAULT NOW()
+
+    CREATE TABLE user (
+        user_id SERIAL PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE storage (
+        storage_id SERIAL PRIMARY KEY,
+        storage_name VARCHAR(100) NOT NULL,
+        description TEXT,
+        user_id INT REFERENCES "User"(user_id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE item_type (
+        type_id SERIAL PRIMARY KEY,
+        type_name VARCHAR(100) NOT NULL
+    );
+
+    CREATE TABLE item (
+        item_id SERIAL PRIMARY KEY,
+        item_name VARCHAR(100) NOT NULL,
+        quantity INT DEFAULT 0,
+        type_id INT REFERENCES Item_Type(type_id) ON DELETE SET NULL,
+        storage_id INT REFERENCES Storage(storage_id) ON DELETE CASCADE,
+        user_id INT REFERENCES "User"(user_id) ON DELETE CASCADE,
+        created_at TIMESTAMP DEFAULT NOW()
+    );
