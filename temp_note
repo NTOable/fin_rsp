@@ -1,9 +1,26 @@
 TABLES
 
     User
+        user_id        PRIMARY KEY AI
+        username       VARCHAR(50) UNIQUE
+        password       TEXT HASHED
+        created_at     TIMESTAMP
 
     Storage
+        storage_id     PRIMARY KEY AI
+        storage_name   VARCHAR(100)
+        description    TEXT
+        user_id        INT REFERENCES User(user_id)
 
     Item
+        type_id        PRIMARY KEY AI
+        type_name      VARCHAR(100)
 
     Item_Type
+        item_id        PRIMARY KEY AI
+        item_name      VARCHAR(100) NOT NULL
+        quantity       INT DEFAULT 0
+        type_id        INT REFERENCES Item_Type(type_id)
+        storage_id     INT REFERENCES Storage(storage_id)
+        user_id        INT REFERENCES User(user_id)
+        created_at     TIMESTAMP DEFAULT NOW()
