@@ -331,26 +331,18 @@
         </div>
     </main>
 </div>
+
 <!--For Testing-->
+
 <script>
     // --- Sample dataset (replace with real data / API) ---
-    const items = [
-        { sku: 'SKU-1001', name: 'Premium Notebook A5', category: 'Stationery', supplier: 'PaperWorks', stock: 320, unitPrice: 3.5, updated: '2025-11-01' },
-        { sku: 'SKU-1002', name: 'Gel Pen 0.5mm', category: 'Stationery', supplier: 'InkFlow', stock: 45, unitPrice: 0.8, updated: '2025-11-06' },
-        { sku: 'SKU-1003', name: 'Wireless Mouse', category: 'Electronics', supplier: 'TechSource', stock: 0, unitPrice: 18.0, updated: '2025-11-03' },
-        { sku: 'SKU-1004', name: 'Keyboard Mechanical', category: 'Electronics', supplier: 'TechSource', stock: 12, unitPrice: 45.0, updated: '2025-11-07' },
-        { sku: 'SKU-1005', name: 'Office Chair Ergonomic', category: 'Furniture', supplier: 'SitWell', stock: 8, unitPrice: 120.0, updated: '2025-11-02' },
-        { sku: 'SKU-1006', name: 'Desk Lamp LED', category: 'Electronics', supplier: 'BrightLite', stock: 110, unitPrice: 22.0, updated: '2025-11-05' },
-        { sku: 'SKU-1007', name: 'Storage Box L', category: 'Supplies', supplier: 'StoreMore', stock: 64, unitPrice: 9.2, updated: '2025-11-04' },
-        { sku: 'SKU-1008', name: 'Packing Tape', category: 'Supplies', supplier: 'BondIt', stock: 510, unitPrice: 1.1, updated: '2025-11-07' },
-        { sku: 'SKU-1009', name: 'Label Printer', category: 'Electronics', supplier: 'PrintMaster', stock: 5, unitPrice: 85.0, updated: '2025-10-29' },
-        { sku: 'SKU-1010', name: 'Filing Cabinet 3-Drawer', category: 'Furniture', supplier: 'CabinetCo', stock: 2, unitPrice: 160.0, updated: '2025-11-02' },
-        { sku: 'SKU-1011', name: 'Stapler Heavy Duty', category: 'Stationery', supplier: 'PaperWorks', stock: 24, unitPrice: 6.5, updated: '2025-11-06' },
-        { sku: 'SKU-1012', name: 'Copy Paper A4 80gsm', category: 'Stationery', supplier: 'PaperWorks', stock: 780, unitPrice: 4.2, updated: '2025-11-07' },
-        { sku: 'SKU-1013', name: 'USB-C Dock', category: 'Electronics', supplier: 'TechSource', stock: 14, unitPrice: 72.0, updated: '2025-11-05' },
-        { sku: 'SKU-1014', name: 'Conference Table', category: 'Furniture', supplier: 'FurniPro', stock: 1, unitPrice: 520.0, updated: '2025-10-28' },
-        { sku: 'SKU-1015', name: 'Whiteboard 90x120', category: 'Supplies', supplier: 'EduTools', stock: 26, unitPrice: 34.0, updated: '2025-11-01' },
-    ];
+    async function loadItems() {
+        const response = await fetch("http://<raspi-ip>:5000/get_items");
+        const items = await response.json();
+        renderTable(items);
+    }
+
+    loadItems();
 
     const LOW_THRESHOLD = 10;
 
