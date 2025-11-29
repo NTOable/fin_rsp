@@ -6,345 +6,1667 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         :root {
-            --bg: #f6f7fb;
-            --surface: #ffffff;
-            --text: #1f2937;
-            --muted: #6b7280;
-            --primary: #2563eb;
-            --primary-contrast: #ffffff;
-            --accent: #0ea5e9;
-            --success: #16a34a;
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #0f1629;
+            --bg-tertiary: #151d35;
+            --surface: rgba(21, 29, 53, 0.7);
+            --surface-hover: rgba(30, 41, 72, 0.8);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #7c3aed;
+            --accent-gradient: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+            --success: #10b981;
             --warning: #f59e0b;
-            --danger: #dc2626;
-            --border: #e5e7eb;
-            --sidebar-bg: #0f172a;
-            --sidebar-text: #cbd5e1;
-            --sidebar-active: #38bdf8;
+            --danger: #ef4444;
+            --border: rgba(255, 255, 255, 0.06);
+            --glow-primary: rgba(0, 212, 255, 0.15);
+            --glow-secondary: rgba(124, 58, 237, 0.15);
         }
-        * { box-sizing: border-box; }
-        html, body { height: 100%; }
-        body {
+
+        * { 
+            box-sizing: border-box; 
             margin: 0;
-            background: var(--bg);
-            color: var(--text);
-            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            padding: 0;
+        }
+
+        html, body { 
+            height: 100%; 
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse 80% 50% at 20% -20%, var(--glow-primary), transparent),
+                radial-gradient(ellipse 60% 40% at 80% 100%, var(--glow-secondary), transparent),
+                var(--bg-primary);
         }
 
         /* Layout */
         .layout {
             display: grid;
-            grid-template-columns: 260px 1fr;
+            grid-template-columns: 280px 1fr;
             min-height: 100vh;
         }
 
         /* Sidebar */
         .sidebar {
-            background: var(--sidebar-bg);
-            color: var(--sidebar-text);
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             padding: 24px 16px;
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            height: 100vh;
         }
+
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 24px;
-            color: #fff;
-            font-weight: 700;
-            letter-spacing: 0.4px;
+            gap: 14px;
+            margin-bottom: 32px;
+            padding: 8px;
         }
+
         .brand .logo {
-            width: 36px; height: 36px; border-radius: 8px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            display: grid; place-items: center; color: #fff;
-            box-shadow: 0 6px 18px rgba(37,99,235,0.35);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--accent-gradient);
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-size: 20px;
+            box-shadow: 
+                0 8px 32px rgba(0, 212, 255, 0.3),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+            animation: pulse-glow 3s ease-in-out infinite;
         }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3); }
+            50% { box-shadow: 0 8px 48px rgba(0, 212, 255, 0.5); }
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-text .title {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-text .subtitle {
+            color: var(--text-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
         .nav {
-            display: grid; gap: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
+
+        .nav-section {
+            margin-top: 24px;
+            margin-bottom: 8px;
+            padding: 0 12px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
         .nav a {
-            display: flex; align-items: center; gap: 12px;
-            color: var(--sidebar-text);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-secondary);
             text-decoration: none;
-            padding: 10px 12px;
-            border-radius: 8px;
-            transition: background 0.2s, color 0.2s;
+            padding: 12px 14px;
+            border-radius: 10px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            font-weight: 500;
         }
-        .nav a:hover { background: rgba(148,163,184,0.1); color: #fff; }
-        .nav a.active { background: rgba(56,189,248,0.15); color: var(--sidebar-active); }
+
+        .nav a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: var(--accent-gradient);
+            border-radius: 0 2px 2px 0;
+            transition: height 0.25s ease;
+        }
+
+        .nav a:hover {
+            background: var(--glass);
+            color: var(--text-primary);
+        }
+
+        .nav a.active {
+            background: rgba(0, 212, 255, 0.08);
+            color: var(--accent-primary);
+        }
+
+        .nav a.active::before {
+            height: 24px;
+        }
+
+        .nav a i {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
         .sidebar .spacer { flex: 1; }
-        .sidebar .footer { font-size: 12px; color: #94a3b8; }
+
+        .sidebar .footer {
+            font-size: 12px;
+            color: var(--text-muted);
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            margin-top: 16px;
+        }
+
+        /* Main content area */
+        main {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
         /* Topbar */
         .topbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 24px;
+            padding: 20px 32px;
             border-bottom: 1px solid var(--border);
-            background: var(--surface);
-            position: sticky; top: 0; z-index: 10;
+            background: rgba(15, 22, 41, 0.8);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
+
+        .topbar .title-section {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
         .topbar .title {
-            font-weight: 700; font-size: 20px;
+            font-weight: 700;
+            font-size: 24px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
+
+        .topbar .breadcrumb {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
         .topbar .actions {
-            display: flex; gap: 8px; align-items: center;
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
+
         .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
-            background: #fff; color: var(--text); cursor: pointer;
-            transition: box-shadow 0.2s, transform 0.02s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
         }
+
+        .btn:hover {
+            background: var(--surface-hover);
+            border-color: var(--glass-border);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
         .btn.primary {
-            background: var(--primary); color: var(--primary-contrast); border-color: var(--primary);
+            background: var(--accent-gradient);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
         }
-        .btn:active { transform: translateY(1px); }
-        .btn:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+
+        .btn.primary:hover {
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.4);
+            transform: translateY(-2px);
+        }
 
         /* Content */
         .content {
-            padding: 24px;
-            display: grid;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
             gap: 24px;
+            flex: 1;
         }
 
         /* KPI Cards */
         .kpis {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
         }
+
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(20px);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
-        .card h4 { margin: 0 0 4px; font-size: 14px; color: var(--muted); font-weight: 600; }
-        .card .value { font-size: 24px; font-weight: 700; margin: 6px 0; }
-        .card .sub {
-            display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px;
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
         }
-        .trend.up { color: var(--success); }
-        .trend.down { color: var(--danger); }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 212, 255, 0.2);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 60px var(--glow-primary);
+        }
+
+        .kpi-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .kpi-card .kpi-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .kpi-card h4 {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-card .value {
+            font-size: 36px;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .kpi-card .sub {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .kpi-card .icon-wrapper {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-size: 24px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+        }
+
+        .kpi-card .icon-wrapper.cyan {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent-primary);
+        }
+
+        .kpi-card .icon-wrapper.purple {
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--accent-secondary);
+        }
+
+        .trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .trend.up {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .trend.down {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
 
         /* Filters */
+        .filters-card {
+            padding: 20px 24px;
+        }
+
         .filters {
-            display: grid; gap: 12px;
-            grid-template-columns: 1fr 200px 180px 180px auto;
+            display: grid;
+            gap: 16px;
+            grid-template-columns: 1fr 180px 160px 160px auto;
             align-items: center;
         }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
         .input, .select {
             width: 100%;
-            padding: 10px 12px;
+            padding: 12px 16px;
+            padding-left: 44px;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            background: #fff;
-            color: var(--text);
+            border-radius: 10px;
+            background: var(--glass);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.25s ease;
         }
-        .input:focus, .select:focus { outline: 2px solid rgba(37,99,235,0.25); }
 
-        /* Grid two columns for charts */
+        .select {
+            padding-left: 16px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+        }
+
+        .input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input:focus, .select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        /* Grid layouts */
         .grid-2 {
             display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 16px;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 20px;
+        }
+
+        .card h4 {
+            margin: 0 0 20px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h4 i {
+            color: var(--accent-primary);
         }
 
         /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
         .table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: var(--surface);
+            border-collapse: collapse;
+            background: transparent;
         }
+
         .table thead th {
-            text-align: left; padding: 12px; font-size: 12px; color: var(--muted);
+            text-align: left;
+            padding: 14px 16px;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
             border-bottom: 1px solid var(--border);
-            background: #fafafa;
+            background: var(--glass);
+            white-space: nowrap;
         }
+
+        .table thead th .btn {
+            padding: 6px 10px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .table tbody td {
-            padding: 12px; border-bottom: 1px solid var(--border);
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
             font-size: 14px;
+            transition: background 0.2s ease;
         }
-        .table tbody tr:hover { background: #f9fbff; }
+
+        .table tbody tr {
+            transition: all 0.25s ease;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(0, 212, 255, 0.03);
+        }
+
+        .table tbody tr:hover td {
+            color: var(--text-primary);
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .sku-cell {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--accent-primary);
+        }
+
+        .name-cell {
+            font-weight: 500;
+        }
+
+        .category-badge {
+            display: inline-flex;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--glass);
+            border: 1px solid var(--border);
+        }
+
+        .value-cell {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+        }
+
         .status {
-            display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px;
-            border-radius: 999px; font-size: 12px; font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
         }
-        .status.ok { background: rgba(22,163,74,0.1); color: var(--success); }
-        .status.low { background: rgba(245,158,11,0.1); color: var(--warning); }
-        .status.out { background: rgba(220,38,38,0.1); color: var(--danger); }
+
+        .status.ok {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status.low {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .status.out {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .date-cell {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
 
         /* Footer */
         .footer-note {
-            font-size: 12px; color: var(--muted);
+            font-size: 13px;
+            color: var(--text-muted);
+            padding: 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-note i {
+            color: var(--accent-primary);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; opacity: 0; }
+        .delay-2 { animation-delay: 0.2s; opacity: 0; }
+        .delay-3 { animation-delay: 0.3s; opacity: 0; }
+        .delay-4 { animation-delay: 0.4s; opacity: 0; }
+        .delay-5 { animation-delay: 0.5s; opacity: 0; }
+        .delay-6 { animation-delay: 0.6s; opacity: 0; }
+
+        /* Chart container styling */
+        .chart-container {
+            position: relative;
+            height: 200px;
         }
 
         /* Responsive */
-        @media (max-width: 1100px) {
+        @media (max-width: 1200px) {
             .kpis { grid-template-columns: repeat(2, 1fr); }
             .grid-2 { grid-template-columns: 1fr; }
-            .filters { grid-template-columns: 1fr 1fr 1fr; }
+            .filters { grid-template-columns: 1fr 1fr; }
         }
+
         @media (max-width: 768px) {
-            .layout { grid-template-columns: 60px 1fr; }
-            .brand span { display: none; }
-            .nav a span { display: none; }
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { 
+                display: none; 
+            }
+            .kpis { grid-template-columns: 1fr; }
             .filters { grid-template-columns: 1fr; }
+            .content { padding: 16px; }
+            .topbar { padding: 16px; }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Live indicator */
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-header h3 i {
+            color: var(--accent-primary);
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--glass);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: #fff;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-group label span.required {
+            color: var(--danger);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--glass);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.25s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 20px 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn.secondary {
+            background: var(--glass);
+            border: 1px solid var(--border);
+        }
+
+        .btn.danger {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: #fff;
+        }
+
+        .btn.danger:hover {
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Page Views */
+        .page-view {
+            display: none;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        /* Settings Page */
+        .settings-section {
+            margin-bottom: 32px;
+        }
+
+        .settings-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-section h3 i {
+            color: var(--accent-primary);
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .settings-item-info h4 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .settings-item-info p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            width: 48px;
+            height: 26px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: var(--border);
+            border-radius: 26px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle input:checked + .toggle-slider {
+            background: var(--accent-primary);
+        }
+
+        .toggle input:checked + .toggle-slider::before {
+            transform: translateX(22px);
+        }
+
+        /* Table Actions */
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--glass);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .btn-icon:hover {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
+        .btn-icon.edit:hover {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .btn-icon.delete:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        /* Help Page */
+        .help-card {
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .help-card h4 {
+            margin-bottom: 12px;
+        }
+
+        .help-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .help-card ul {
+            margin-top: 12px;
+            padding-left: 20px;
+            color: var(--text-secondary);
+        }
+
+        .help-card ul li {
+            margin-bottom: 8px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--border);
+        }
+
+        .empty-state h4 {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
         }
     </style>
 </head>
 <body>
+<div class="bg-pattern"></div>
 <div class="layout">
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="brand">
             <div class="logo"><i class="ti ti-package"></i></div>
-            <span>IMS (Inventory Management System)</span>
+            <div class="brand-text">
+                <span class="title">IMS Pro</span>
+                <span class="subtitle">Inventory System</span>
         </div>
-        <nav class="nav">
-            <a href="#" class="active"><i class="ti ti-dashboard"></i><span>Dashboard</span></a>
-            <a href="#"><i class="ti ti-box"></i><span>Items</span></a>
-<!--            <a href="#"><i class="ti ti-truck-delivery"></i><span>Suppliers</span></a>-->
-<!--            <a href="#"><i class="ti ti-clipboard-check"></i><span>Orders</span></a>-->
-            <a href="#"><i class="ti ti-settings"></i><span>Settings</span></a>
+        </div>
+        <div class="nav-section">Main Menu</div>
+        <nav class="nav" id="mainNav">
+            <a href="#" class="active" data-page="dashboard"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></a>
+            <a href="#" data-page="inventory"><i class="ti ti-box"></i><span>Inventory</span></a>
+            <a href="#" data-page="analytics"><i class="ti ti-chart-bar"></i><span>Analytics</span></a>
+            <a href="#" data-page="reports"><i class="ti ti-report"></i><span>Reports</span></a>
+        </nav>
+        <div class="nav-section">System</div>
+        <nav class="nav" id="systemNav">
+            <a href="#" data-page="settings"><i class="ti ti-settings"></i><span>Settings</span></a>
+            <a href="#" data-page="help"><i class="ti ti-help-circle"></i><span>Help Center</span></a>
         </nav>
         <div class="spacer"></div>
-        <div class="footer">© 2025 CIIT OS Group 3</div>
+        <div class="footer">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <div class="live-dot"></div>
+                <span>System Online</span>
+            </div>
+            © 2025 CIIT OS Group 3
+        </div>
     </aside>
 
     <!-- Main -->
     <main>
         <div class="topbar">
+            <div class="title-section">
             <div class="title">Inventory Dashboard</div>
+                <div class="breadcrumb">Home / Dashboard / Overview</div>
+            </div>
             <div class="actions">
-                <button class="btn" id="btnExport"><i class="ti ti-file-type-csv"></i>Export CSV</button>
+                <div class="live-indicator">
+                    <div class="live-dot"></div>
+                    Live Data
+                </div>
+                <button class="btn" id="btnExport"><i class="ti ti-file-export"></i>Export</button>
                 <button class="btn primary" id="btnAdd"><i class="ti ti-plus"></i>Add Item</button>
             </div>
         </div>
 
         <div class="content">
+            <!-- Dashboard Page -->
+            <div class="page-view active" id="page-dashboard">
             <!-- KPIs -->
             <section class="kpis">
-                <div class="card">
+                <div class="card kpi-card animate-in delay-1">
+                    <div class="kpi-content">
                     <h4>Total Items</h4>
-<!--                    Add SQL Queries here to retrieve data from Storage table from currently logged-in User via FK user_id  -->
                     <div class="value" id="kpiTotalItems">0</div>
-                    <div class="sub"><span class="trend up"><i class="ti ti-arrow-up-right"></i> +3.2%</span><span>vs last month</span></div>
+                        <div class="sub">
+                            <span class="trend up"><i class="ti ti-trending-up"></i> +3.2%</span>
+                            <span>vs last month</span>
                 </div>
-<!--                <div class="card">-->
-<!--                    <h4>Total stock units</h4>-->
-<!--                    <div class="value" id="kpiTotalUnits">0</div>-->
-<!--                    <div class="sub"><span class="trend down"><i class="ti ti-arrow-down-right"></i> -1.1%</span><span>vs last month</span></div>-->
-<!--                </div>-->
-                <div class="card">
+                    </div>
+                    <div class="icon-wrapper cyan">
+                        <i class="ti ti-packages"></i>
+                    </div>
+                </div>
+                <div class="card kpi-card animate-in delay-2">
+                    <div class="kpi-content">
                     <h4>Inventory Value</h4>
                     <div class="value" id="kpiStockValue">$0</div>
-                    <div class="sub"><span class="trend up"><i class="ti ti-arrow-up-right"></i> +0.8%</span><span>vs last month</span></div>
+                        <div class="sub">
+                            <span class="trend up"><i class="ti ti-trending-up"></i> +0.8%</span>
+                            <span>vs last month</span>
                 </div>
-<!--                <div class="card">-->
-<!--                    <h4>Low/out items</h4>-->
-<!--                    <div class="value" id="kpiLowOut">0</div>-->
-<!--                    <div class="sub"><span>Threshold: 10 units</span></div>-->
-<!--                </div>-->
+                    </div>
+                    <div class="icon-wrapper purple">
+                        <i class="ti ti-currency-dollar"></i>
+                    </div>
+                </div>
             </section>
 
             <!-- Filters -->
-            <section class="card">
+            <section class="card filters-card animate-in delay-3">
                 <div class="filters">
-                    <input class="input" id="searchInput" placeholder="Search by name, SKU, supplier..." />
+                    <div class="input-wrapper">
+                        <i class="ti ti-search"></i>
+                        <input class="input" id="searchInput" placeholder="Search items, SKU, supplier..." />
+                    </div>
                     <select class="select" id="categoryFilter">
                         <option value="">All Categories</option>
                     </select>
                     <select class="select" id="statusFilter">
-                        <option value="">All status</option>
-                        <option value="ok">In stock</option>
-                        <option value="low">Low stock</option>
-                        <option value="out">Out of stock</option>
+                        <option value="">All Status</option>
+                        <option value="ok">In Stock</option>
+                        <option value="low">Low Stock</option>
+                        <option value="out">Out of Stock</option>
                     </select>
                     <select class="select" id="supplierFilter">
-                        <option value="">All suppliers</option>
+                        <option value="">All Suppliers</option>
                     </select>
-                    <button class="btn" id="resetFilters"><i class="ti ti-x"></i>Reset</button>
+                    <button class="btn" id="resetFilters"><i class="ti ti-refresh"></i>Reset</button>
                 </div>
             </section>
 
             <!-- Charts -->
-            <section class="grid-2">
+            <section class="grid-2 animate-in delay-4">
                 <div class="card">
-                    <h4>Category breakdown</h4>
-                    <canvas id="categoryChart" height="140"></canvas>
+                    <h4><i class="ti ti-chart-bar"></i> Category Breakdown</h4>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
                 </div>
                 <div class="card">
-                    <h4>Stock status distribution</h4>
-                    <canvas id="statusChart" height="140"></canvas>
+                    <h4><i class="ti ti-chart-donut-3"></i> Stock Distribution</h4>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
                 </div>
             </section>
 
-            <section class="grid-2">
+            <section class="grid-2 animate-in delay-5">
                 <div class="card">
-                    <h4>Monthly stock movement</h4>
-                    <canvas id="movementChart" height="160"></canvas>
+                    <h4><i class="ti ti-chart-line"></i> Monthly Movement</h4>
+                    <div class="chart-container">
+                        <canvas id="movementChart"></canvas>
+                    </div>
                 </div>
                 <div class="card">
-                    <h4>Top items by value</h4>
-                    <canvas id="topValueChart" height="160"></canvas>
+                    <h4><i class="ti ti-trophy"></i> Top Items by Value</h4>
+                    <div class="chart-container">
+                        <canvas id="topValueChart"></canvas>
+                    </div>
                 </div>
             </section>
 
             <!-- Table -->
-            <section class="card">
-                <h4 style="margin-bottom:12px;">Inventory items</h4>
+            <section class="card animate-in delay-6">
+                <h4 style="margin-bottom:16px;"><i class="ti ti-list-details"></i> Inventory Items</h4>
+                <div class="table-wrapper">
                 <table class="table" id="inventoryTable">
                     <thead>
                     <tr>
-                        <th><button class="btn" data-sort="sku">SKU</button></th>
-                        <th><button class="btn" data-sort="name">Name</button></th>
+                            <th><button class="btn" data-sort="sku">SKU <i class="ti ti-arrows-sort"></i></button></th>
+                            <th><button class="btn" data-sort="name">Name <i class="ti ti-arrows-sort"></i></button></th>
                         <th>Category</th>
                         <th>Supplier</th>
-                        <th><button class="btn" data-sort="stock">Stock</button></th>
-                        <th>Unit price</th>
-                        <th>Total value</th>
+                            <th><button class="btn" data-sort="stock">Stock <i class="ti ti-arrows-sort"></i></button></th>
+                            <th>Unit Price</th>
+                            <th>Total Value</th>
                         <th>Status</th>
                         <th>Updated</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
+                </div>
             </section>
 
-            <div class="footer-note">Tip: Use the filters and header buttons to sort, search, and export.</div>
+            <div class="footer-note">
+                <i class="ti ti-info-circle"></i>
+                Pro Tip: Use filters and column headers to sort, search, and export your inventory data efficiently.
+            </div>
+            </div><!-- End Dashboard Page -->
+
+            <!-- Inventory Page -->
+            <div class="page-view" id="page-inventory">
+                <section class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h4 style="margin: 0;"><i class="ti ti-box"></i> Full Inventory Management</h4>
+                        <button class="btn primary" id="btnAddInventory"><i class="ti ti-plus"></i>Add New Item</button>
+                    </div>
+                    <div class="filters" style="margin-bottom: 20px;">
+                        <div class="input-wrapper">
+                            <i class="ti ti-search"></i>
+                            <input class="input" id="inventorySearch" placeholder="Search inventory..." />
+                        </div>
+                        <select class="select" id="inventoryCategoryFilter">
+                            <option value="">All Categories</option>
+                        </select>
+                        <select class="select" id="inventoryStatusFilter">
+                            <option value="">All Status</option>
+                            <option value="ok">In Stock</option>
+                            <option value="low">Low Stock</option>
+                            <option value="out">Out of Stock</option>
+                        </select>
+                        <select class="select" id="inventorySupplierFilter">
+                            <option value="">All Suppliers</option>
+                        </select>
+                        <button class="btn" id="inventoryResetFilters"><i class="ti ti-refresh"></i>Reset</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table" id="fullInventoryTable">
+                            <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Supplier</th>
+                                <th>Stock</th>
+                                <th>Unit Price</th>
+                                <th>Total Value</th>
+                                <th>Status</th>
+                                <th>Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="fullInventoryBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div><!-- End Inventory Page -->
+
+            <!-- Analytics Page -->
+            <div class="page-view" id="page-analytics">
+                <section class="kpis" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="card kpi-card">
+                        <div class="kpi-content">
+                            <h4>Total SKUs</h4>
+                            <div class="value" id="analyticsTotalSKU">0</div>
+                        </div>
+                        <div class="icon-wrapper cyan"><i class="ti ti-barcode"></i></div>
+                    </div>
+                    <div class="card kpi-card">
+                        <div class="kpi-content">
+                            <h4>Categories</h4>
+                            <div class="value" id="analyticsCategories">0</div>
+                        </div>
+                        <div class="icon-wrapper purple"><i class="ti ti-category"></i></div>
+                    </div>
+                    <div class="card kpi-card">
+                        <div class="kpi-content">
+                            <h4>Suppliers</h4>
+                            <div class="value" id="analyticsSuppliers">0</div>
+                        </div>
+                        <div class="icon-wrapper cyan"><i class="ti ti-truck"></i></div>
+                    </div>
+                    <div class="card kpi-card">
+                        <div class="kpi-content">
+                            <h4>Low Stock Items</h4>
+                            <div class="value" id="analyticsLowStock">0</div>
+                        </div>
+                        <div class="icon-wrapper purple"><i class="ti ti-alert-triangle"></i></div>
+                    </div>
+                </section>
+                <section class="grid-2" style="margin-top: 24px;">
+                    <div class="card">
+                        <h4><i class="ti ti-chart-pie"></i> Inventory by Category</h4>
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="analyticsCategoryChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h4><i class="ti ti-chart-bar"></i> Stock by Supplier</h4>
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="analyticsSupplierChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+            </div><!-- End Analytics Page -->
+
+            <!-- Reports Page -->
+            <div class="page-view" id="page-reports">
+                <section class="card">
+                    <h4><i class="ti ti-report"></i> Generate Reports</h4>
+                    <p style="color: var(--text-secondary); margin-bottom: 24px;">Select a report type to generate and download.</p>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                        <div class="card" style="cursor: pointer;" onclick="generateReport('inventory')">
+                            <div style="text-align: center; padding: 20px;">
+                                <i class="ti ti-file-spreadsheet" style="font-size: 48px; color: var(--accent-primary);"></i>
+                                <h4 style="margin: 16px 0 8px;">Full Inventory Report</h4>
+                                <p style="color: var(--text-muted); font-size: 13px;">Export complete inventory data</p>
+                            </div>
+                        </div>
+                        <div class="card" style="cursor: pointer;" onclick="generateReport('lowstock')">
+                            <div style="text-align: center; padding: 20px;">
+                                <i class="ti ti-alert-circle" style="font-size: 48px; color: var(--warning);"></i>
+                                <h4 style="margin: 16px 0 8px;">Low Stock Report</h4>
+                                <p style="color: var(--text-muted); font-size: 13px;">Items below threshold</p>
+                            </div>
+                        </div>
+                        <div class="card" style="cursor: pointer;" onclick="generateReport('value')">
+                            <div style="text-align: center; padding: 20px;">
+                                <i class="ti ti-currency-dollar" style="font-size: 48px; color: var(--success);"></i>
+                                <h4 style="margin: 16px 0 8px;">Value Report</h4>
+                                <p style="color: var(--text-muted); font-size: 13px;">Inventory valuation summary</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div><!-- End Reports Page -->
+
+            <!-- Settings Page -->
+            <div class="page-view" id="page-settings">
+                <section class="card">
+                    <div class="settings-section">
+                        <h3><i class="ti ti-adjustments"></i> General Settings</h3>
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <h4>Low Stock Threshold</h4>
+                                <p>Items with stock below this value will be marked as low stock</p>
+                            </div>
+                            <input type="number" class="form-input" style="width: 100px;" id="lowStockThreshold" value="10" min="1">
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <h4>Auto-refresh Dashboard</h4>
+                                <p>Automatically refresh data every 30 seconds</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="autoRefresh">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <h4>Show Stock Alerts</h4>
+                                <p>Display notifications for low stock items</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="showAlerts" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3><i class="ti ti-database"></i> Data Management</h3>
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <h4>Export All Data</h4>
+                                <p>Download complete inventory database as CSV</p>
+                            </div>
+                            <button class="btn" onclick="exportAllData()"><i class="ti ti-download"></i>Export</button>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <h4>Load Sample Data</h4>
+                                <p>Add sample inventory items to the database</p>
+                            </div>
+                            <button class="btn" onclick="seedSampleData()"><i class="ti ti-database-import"></i>Load Samples</button>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <h4>Refresh from Database</h4>
+                                <p>Reload all data from the PostgreSQL database</p>
+                            </div>
+                            <button class="btn" onclick="refreshData()"><i class="ti ti-refresh"></i>Refresh</button>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <h4>Clear All Data</h4>
+                                <p>Remove all inventory items (cannot be undone)</p>
+                            </div>
+                            <button class="btn danger" onclick="clearAllData()"><i class="ti ti-trash"></i>Clear</button>
+                        </div>
+                    </div>
+                    <button class="btn primary" onclick="saveSettings()"><i class="ti ti-device-floppy"></i>Save Settings</button>
+                </section>
+            </div><!-- End Settings Page -->
+
+            <!-- Help Page -->
+            <div class="page-view" id="page-help">
+                <div class="card help-card">
+                    <h4><i class="ti ti-help"></i> Getting Started</h4>
+                    <p>Welcome to IMS Pro! This inventory management system helps you track and manage your stock efficiently.</p>
+                    <ul>
+                        <li><strong>Dashboard:</strong> View key metrics and charts at a glance</li>
+                        <li><strong>Inventory:</strong> Manage all your items with full CRUD operations</li>
+                        <li><strong>Analytics:</strong> Deep dive into your inventory data</li>
+                        <li><strong>Reports:</strong> Generate and export various reports</li>
+                    </ul>
+                </div>
+                <div class="card help-card">
+                    <h4><i class="ti ti-plus"></i> Adding Items</h4>
+                    <p>To add a new item to your inventory:</p>
+                    <ul>
+                        <li>Click the "Add Item" button in the top bar or Inventory page</li>
+                        <li>Fill in all required fields (marked with *)</li>
+                        <li>Click "Add Item" to save</li>
+                    </ul>
+                </div>
+                <div class="card help-card">
+                    <h4><i class="ti ti-filter"></i> Filtering & Searching</h4>
+                    <p>Use the filter bar to find specific items:</p>
+                    <ul>
+                        <li><strong>Search:</strong> Type to search by SKU, name, or supplier</li>
+                        <li><strong>Category:</strong> Filter by product category</li>
+                        <li><strong>Status:</strong> Filter by stock status (In Stock, Low, Out)</li>
+                        <li><strong>Supplier:</strong> Filter by supplier name</li>
+                    </ul>
+                </div>
+                <div class="card help-card">
+                    <h4><i class="ti ti-mail"></i> Contact Support</h4>
+                    <p>Need help? Contact us at: <a href="mailto:support@ciit.edu" style="color: var(--accent-primary);">support@ciit.edu</a></p>
+                </div>
+            </div><!-- End Help Page -->
         </div>
     </main>
 </div>
 
-<!--For Testing-->
+<!-- Add/Edit Item Modal -->
+<div class="modal-overlay" id="itemModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="ti ti-package"></i> <span id="modalTitle">Add New Item</span></h3>
+            <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="itemForm">
+                <input type="hidden" id="editIndex" value="-1">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>SKU <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="itemSku" placeholder="e.g., SKU-1001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Item Name <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="itemName" placeholder="Enter item name" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category <span class="required">*</span></label>
+                        <select class="form-input" id="itemCategory" required>
+                            <option value="">Select category</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Furniture">Furniture</option>
+                            <option value="Stationery">Stationery</option>
+                            <option value="Supplies">Supplies</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Supplier <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="itemSupplier" placeholder="Enter supplier name" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Stock Quantity <span class="required">*</span></label>
+                        <input type="number" class="form-input" id="itemStock" placeholder="0" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Price ($) <span class="required">*</span></label>
+                        <input type="number" class="form-input" id="itemPrice" placeholder="0.00" min="0" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select class="form-input" id="itemStatus">
+                        <option value="auto">Auto (based on stock)</option>
+                        <option value="In Stock">In Stock</option>
+                        <option value="Low Stock">Low Stock</option>
+                        <option value="Out of Stock">Out of Stock</option>
+                    </select>
+                    <small style="color: var(--text-muted); font-size: 12px; margin-top: 4px; display: block;">
+                        Select "Auto" to determine status based on stock quantity, or manually set it.
+                    </small>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn secondary" onclick="closeModal()">Cancel</button>
+            <button type="button" class="btn primary" onclick="saveItem()"><i class="ti ti-check"></i> <span id="saveButtonText">Add Item</span></button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3><i class="ti ti-alert-triangle" style="color: var(--danger);"></i> Confirm Delete</h3>
+            <button class="modal-close" onclick="closeDeleteModal()"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="modal-body" style="text-align: center;">
+            <p style="color: var(--text-secondary); margin-bottom: 8px;">Are you sure you want to delete this item?</p>
+            <p style="font-weight: 600;" id="deleteItemName"></p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 12px;">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer" style="justify-content: center;">
+            <button type="button" class="btn secondary" onclick="closeDeleteModal()">Cancel</button>
+            <button type="button" class="btn danger" onclick="confirmDelete()"><i class="ti ti-trash"></i> Delete</button>
+        </div>
+    </div>
+</div>
 
 <script>
-    // --- Sample dataset (replace with real data / API) ---
-    async function loadItems() {
-        const response = await fetch("http://<raspi-ip>:5000/get_items");
-        const items = await response.json();
-        renderTable(items);
+    // --- API Configuration ---
+    const API_BASE_URL = 'http://localhost:5001/api';
+    
+    // --- Data Store ---
+    let items = [];
+    let LOW_THRESHOLD = 10;
+    let isApiConnected = false;
+
+    // --- API Functions ---
+    async function fetchItems() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/items`);
+            if (!response.ok) throw new Error('Failed to fetch items');
+            const data = await response.json();
+            // Map API response to frontend format
+            items = data.map(item => ({
+                id: item.id,
+                sku: item.sku,
+                name: item.name,
+                category: item.category,
+                supplier: item.supplier,
+                stock: item.stock,
+                unitPrice: item.unit_price,
+                status: item.status,
+                updated: item.updated_at
+            }));
+            isApiConnected = true;
+            updateConnectionStatus(true);
+            return items;
+        } catch (error) {
+            console.error('API Error:', error);
+            isApiConnected = false;
+            updateConnectionStatus(false);
+            // Load sample data if API is not available
+            if (items.length === 0) {
+                items = getSampleData();
+            }
+            return items;
+        }
     }
 
-    loadItems();
+    async function addItemToAPI(itemData) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/items`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sku: itemData.sku,
+                    name: itemData.name,
+                    category: itemData.category,
+                    supplier: itemData.supplier,
+                    stock: itemData.stock,
+                    unit_price: itemData.unitPrice,
+                    status: itemData.status
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Failed to add item');
+            return { success: true, item: data.item };
+        } catch (error) {
+            console.error('Add Item Error:', error);
+            return { success: false, error: error.message };
+        }
+    }
 
-    const LOW_THRESHOLD = 10;
+    async function updateItemInAPI(itemId, itemData) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/items/${itemId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sku: itemData.sku,
+                    name: itemData.name,
+                    category: itemData.category,
+                    supplier: itemData.supplier,
+                    stock: itemData.stock,
+                    unit_price: itemData.unitPrice,
+                    status: itemData.status
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Failed to update item');
+            return { success: true, item: data.item };
+        } catch (error) {
+            console.error('Update Item Error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async function deleteItemFromAPI(itemId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/items/${itemId}`, {
+                method: 'DELETE'
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Failed to delete item');
+            return { success: true };
+        } catch (error) {
+            console.error('Delete Item Error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    function updateConnectionStatus(connected) {
+        const indicators = document.querySelectorAll('.live-indicator, .sidebar .footer .live-dot');
+        const statusText = document.querySelector('.live-indicator');
+        if (statusText) {
+            if (connected) {
+                statusText.innerHTML = '<div class="live-dot"></div> Connected';
+                statusText.style.background = 'rgba(16, 185, 129, 0.1)';
+                statusText.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+                statusText.style.color = 'var(--success)';
+            } else {
+                statusText.innerHTML = '<div class="live-dot" style="background: var(--warning);"></div> Offline Mode';
+                statusText.style.background = 'rgba(245, 158, 11, 0.1)';
+                statusText.style.borderColor = 'rgba(245, 158, 11, 0.2)';
+                statusText.style.color = 'var(--warning)';
+            }
+        }
+    }
+
+    function getSampleData() {
+        return [
+            { id: 1, sku: 'SKU-1001', name: 'Premium Notebook A5', category: 'Stationery', supplier: 'PaperWorks', stock: 320, unitPrice: 3.5, updated: '2025-11-01' },
+            { id: 2, sku: 'SKU-1002', name: 'Gel Pen 0.5mm', category: 'Stationery', supplier: 'InkFlow', stock: 45, unitPrice: 0.8, updated: '2025-11-06' },
+            { id: 3, sku: 'SKU-1003', name: 'Wireless Mouse', category: 'Electronics', supplier: 'TechSource', stock: 0, unitPrice: 18.0, updated: '2025-11-03' },
+            { id: 4, sku: 'SKU-1004', name: 'Keyboard Mechanical', category: 'Electronics', supplier: 'TechSource', stock: 12, unitPrice: 45.0, updated: '2025-11-07' },
+            { id: 5, sku: 'SKU-1005', name: 'Office Chair Ergonomic', category: 'Furniture', supplier: 'SitWell', stock: 8, unitPrice: 120.0, updated: '2025-11-02' },
+            { id: 6, sku: 'SKU-1006', name: 'Desk Lamp LED', category: 'Electronics', supplier: 'BrightLite', stock: 110, unitPrice: 22.0, updated: '2025-11-05' },
+            { id: 7, sku: 'SKU-1007', name: 'Storage Box L', category: 'Supplies', supplier: 'StoreMore', stock: 64, unitPrice: 9.2, updated: '2025-11-04' },
+            { id: 8, sku: 'SKU-1008', name: 'Packing Tape', category: 'Supplies', supplier: 'BondIt', stock: 510, unitPrice: 1.1, updated: '2025-11-07' },
+            { id: 9, sku: 'SKU-1009', name: 'Label Printer', category: 'Electronics', supplier: 'PrintMaster', stock: 5, unitPrice: 85.0, updated: '2025-10-29' },
+            { id: 10, sku: 'SKU-1010', name: 'Filing Cabinet 3-Drawer', category: 'Furniture', supplier: 'CabinetCo', stock: 2, unitPrice: 160.0, updated: '2025-11-02' },
+            { id: 11, sku: 'SKU-1011', name: 'Stapler Heavy Duty', category: 'Stationery', supplier: 'PaperWorks', stock: 24, unitPrice: 6.5, updated: '2025-11-06' },
+            { id: 12, sku: 'SKU-1012', name: 'Copy Paper A4 80gsm', category: 'Stationery', supplier: 'PaperWorks', stock: 780, unitPrice: 4.2, updated: '2025-11-07' },
+            { id: 13, sku: 'SKU-1013', name: 'USB-C Dock', category: 'Electronics', supplier: 'TechSource', stock: 14, unitPrice: 72.0, updated: '2025-11-05' },
+            { id: 14, sku: 'SKU-1014', name: 'Conference Table', category: 'Furniture', supplier: 'FurniPro', stock: 1, unitPrice: 520.0, updated: '2025-10-28' },
+            { id: 15, sku: 'SKU-1015', name: 'Whiteboard 90x120', category: 'Supplies', supplier: 'EduTools', stock: 26, unitPrice: 34.0, updated: '2025-11-01' },
+        ];
+    }
 
     // --- State ---
     let filtered = [...items];
@@ -354,9 +1676,7 @@
     // --- Elements ---
     const tbody = document.querySelector('#inventoryTable tbody');
     const kpiTotalItems = document.getElementById('kpiTotalItems');
-    const kpiTotalUnits = document.getElementById('kpiTotalUnits');
     const kpiStockValue = document.getElementById('kpiStockValue');
-    const kpiLowOut = document.getElementById('kpiLowOut');
 
     const searchInput = document.getElementById('searchInput');
     const categoryFilter = document.getElementById('categoryFilter');
@@ -369,38 +1689,60 @@
 
     // --- Utils ---
     const fmtCurrency = (n) => '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    
+    // Convert status string to CSS class
+    const statusToClass = (status) => {
+        if (status === 'In Stock') return 'ok';
+        if (status === 'Low Stock') return 'low';
+        if (status === 'Out of Stock') return 'out';
+        return 'ok';
+    };
+    
+    // Get status - use item's status if available, otherwise calculate from stock
+    const getItemStatus = (item) => {
+        if (item.status && ['In Stock', 'Low Stock', 'Out of Stock'].includes(item.status)) {
+            return item.status;
+        }
+        // Auto-calculate
+        if (item.stock <= 0) return 'Out of Stock';
+        if (item.stock <= LOW_THRESHOLD) return 'Low Stock';
+        return 'In Stock';
+    };
+    
+    // Legacy function for backward compatibility
     const statusOf = (stock) => stock <= 0 ? 'out' : (stock <= LOW_THRESHOLD ? 'low' : 'ok');
 
     // --- Populate filters ---
     function initFilters() {
         const categories = Array.from(new Set(items.map(i => i.category))).sort();
         const suppliers = Array.from(new Set(items.map(i => i.supplier))).sort();
-        categoryFilter.innerHTML = '<option value="">All categories</option>' + categories.map(c => `<option value="${c}">${c}</option>`).join('');
-        supplierFilter.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(s => `<option value="${s}">${s}</option>`).join('');
+        categoryFilter.innerHTML = '<option value="">All Categories</option>' + categories.map(c => `<option value="${c}">${c}</option>`).join('');
+        supplierFilter.innerHTML = '<option value="">All Suppliers</option>' + suppliers.map(s => `<option value="${s}">${s}</option>`).join('');
     }
 
     // --- Render table ---
     function renderTable() {
         tbody.innerHTML = '';
-        filtered.forEach(item => {
+        filtered.forEach((item, index) => {
             const tr = document.createElement('tr');
+            tr.style.animationDelay = `${index * 0.03}s`;
             const totalValue = item.stock * item.unitPrice;
             const st = statusOf(item.stock);
             tr.innerHTML = `
-<td>${item.sku}</td>
-<td>${item.name}</td>
-<td>${item.category}</td>
+                <td class="sku-cell">${item.sku}</td>
+                <td class="name-cell">${item.name}</td>
+                <td><span class="category-badge">${item.category}</span></td>
 <td>${item.supplier}</td>
-<td>${item.stock}</td>
-<td>${fmtCurrency(item.unitPrice)}</td>
-<td>${fmtCurrency(totalValue)}</td>
+                <td class="value-cell">${item.stock}</td>
+                <td class="value-cell">${fmtCurrency(item.unitPrice)}</td>
+                <td class="value-cell">${fmtCurrency(totalValue)}</td>
 <td>
 <span class="status ${st}">
 ${st === 'ok' ? '<i class="ti ti-circle-check"></i>' : st === 'low' ? '<i class="ti ti-alert-triangle"></i>' : '<i class="ti ti-circle-off"></i>'}
-${st === 'ok' ? 'In stock' : st === 'low' ? 'Low' : 'Out'}
+                        ${st === 'ok' ? 'In Stock' : st === 'low' ? 'Low Stock' : 'Out of Stock'}
 </span>
 </td>
-<td>${item.updated}</td>
+                <td class="date-cell">${item.updated}</td>
 `;
             tbody.appendChild(tr);
         });
@@ -409,29 +1751,66 @@ ${st === 'ok' ? 'In stock' : st === 'low' ? 'Low' : 'Out'}
     // --- KPIs ---
     function renderKPIs() {
         const totalItems = filtered.length;
-        const totalUnits = filtered.reduce((sum, i) => sum + i.stock, 0);
         const stockValue = filtered.reduce((sum, i) => sum + i.stock * i.unitPrice, 0);
-        const lowOut = filtered.filter(i => statusOf(i.stock) !== 'ok').length;
 
-        kpiTotalItems.textContent = totalItems.toLocaleString();
-        kpiTotalUnits.textContent = totalUnits.toLocaleString();
-        kpiStockValue.textContent = fmtCurrency(stockValue);
-        kpiLowOut.textContent = lowOut.toLocaleString();
+        // Animate counter
+        animateValue(kpiTotalItems, totalItems);
+        animateValue(kpiStockValue, stockValue, true);
+    }
+
+    function animateValue(element, target, isCurrency = false) {
+        const duration = 800;
+        const start = parseInt(element.textContent.replace(/[^0-9.-]/g, '')) || 0;
+        const startTime = performance.now();
+        
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeOut = 1 - Math.pow(1 - progress, 3);
+            const current = start + (target - start) * easeOut;
+            
+            if (isCurrency) {
+                element.textContent = fmtCurrency(current);
+            } else {
+                element.textContent = Math.floor(current).toLocaleString();
+            }
+            
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+        }
+        requestAnimationFrame(update);
     }
 
     // --- Charts ---
     let categoryChart, statusChart, movementChart, topValueChart;
+
+    const chartColors = {
+        primary: '#00d4ff',
+        secondary: '#7c3aed',
+        success: '#10b981',
+        warning: '#f59e0b',
+        danger: '#ef4444',
+        gradient1: 'rgba(0, 212, 255, 0.8)',
+        gradient2: 'rgba(124, 58, 237, 0.8)',
+    };
+
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.06)';
+    Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
 
     function buildCategoryData(itemsArr) {
         const map = new Map();
         itemsArr.forEach(i => map.set(i.category, (map.get(i.category) || 0) + i.stock));
         return Array.from(map.entries()).sort((a,b)=>b[1]-a[1]);
     }
+
     function buildStatusData(itemsArr) {
         const map = { ok: 0, low: 0, out: 0 };
         itemsArr.forEach(i => map[statusOf(i.stock)]++);
         return map;
     }
+
     function buildTopValue(itemsArr, n = 5) {
         return [...itemsArr]
             .map(i => ({ name: i.name, value: i.stock * i.unitPrice }))
@@ -446,26 +1825,53 @@ ${st === 'ok' ? 'In stock' : st === 'low' ? 'Low' : 'Out'}
         const catValues = catData.map(([,v]) => v);
 
         if (categoryChart) categoryChart.destroy();
-        categoryChart = new Chart(document.getElementById('categoryChart'), {
+        const catCtx = document.getElementById('categoryChart').getContext('2d');
+        const catGradient = catCtx.createLinearGradient(0, 0, 0, 200);
+        catGradient.addColorStop(0, chartColors.gradient1);
+        catGradient.addColorStop(1, chartColors.gradient2);
+
+        categoryChart = new Chart(catCtx, {
             type: 'bar',
             data: {
                 labels: catLabels,
                 datasets: [{
-                    label: 'Stock units',
+                    label: 'Stock Units',
                     data: catValues,
-                    backgroundColor: '#2563eb'
+                    backgroundColor: catGradient,
+                    borderRadius: 8,
+                    borderSkipped: false,
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    x: { grid: { display: false } },
-                    y: { beginAtZero: true, grid: { color: '#eee' } }
+                    x: { 
+                        grid: { display: false },
+                        ticks: { font: { size: 11 } }
+                    },
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: 'rgba(255,255,255,0.04)' },
+                        ticks: { font: { size: 11 } }
+                    }
                 },
                 plugins: {
                     legend: { display: false },
-                    tooltip: { mode: 'index', intersect: false }
+                    tooltip: { 
+                        mode: 'index', 
+                        intersect: false,
+                        backgroundColor: 'rgba(15, 22, 41, 0.95)',
+                        borderColor: 'rgba(0, 212, 255, 0.3)',
+                        borderWidth: 1,
+                        padding: 12,
+                        titleFont: { weight: 600 },
+                        cornerRadius: 8,
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
                 }
             }
         });
@@ -476,44 +1882,132 @@ ${st === 'ok' ? 'In stock' : st === 'low' ? 'Low' : 'Out'}
         statusChart = new Chart(document.getElementById('statusChart'), {
             type: 'doughnut',
             data: {
-                labels: ['In stock', 'Low', 'Out'],
+                labels: ['In Stock', 'Low Stock', 'Out of Stock'],
                 datasets: [{
                     data: [stData.ok, stData.low, stData.out],
-                    backgroundColor: ['#16a34a', '#f59e0b', '#dc2626']
+                    backgroundColor: [chartColors.success, chartColors.warning, chartColors.danger],
+                    borderWidth: 0,
+                    hoverOffset: 8,
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom' }
+                    legend: { 
+                        position: 'bottom',
+                        labels: {
+                            padding: 16,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 22, 41, 0.95)',
+                        borderColor: 'rgba(0, 212, 255, 0.3)',
+                        borderWidth: 1,
+                        padding: 12,
+                        cornerRadius: 8,
+                    }
                 },
-                cutout: '60%'
+                cutout: '70%',
+                animation: {
+                    animateRotate: true,
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                }
             }
         });
 
-// Monthly movement (sample synthetic data)
+        // Monthly movement
         const months = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
         const received = [420, 500, 380, 460, 520, 430, 480];
         const issued = [360, 450, 410, 390, 500, 420, 470];
 
         if (movementChart) movementChart.destroy();
-        movementChart = new Chart(document.getElementById('movementChart'), {
+        const moveCtx = document.getElementById('movementChart').getContext('2d');
+        
+        const receivedGradient = moveCtx.createLinearGradient(0, 0, 0, 200);
+        receivedGradient.addColorStop(0, 'rgba(0, 212, 255, 0.3)');
+        receivedGradient.addColorStop(1, 'rgba(0, 212, 255, 0)');
+        
+        const issuedGradient = moveCtx.createLinearGradient(0, 0, 0, 200);
+        issuedGradient.addColorStop(0, 'rgba(124, 58, 237, 0.3)');
+        issuedGradient.addColorStop(1, 'rgba(124, 58, 237, 0)');
+
+        movementChart = new Chart(moveCtx, {
             type: 'line',
             data: {
                 labels: months,
                 datasets: [
-                    { label: 'Received', data: received, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.15)', tension: 0.3, fill: true },
-                    { label: 'Issued', data: issued, borderColor: '#0ea5e9', backgroundColor: 'rgba(14,165,233,0.15)', tension: 0.3, fill: true }
+                    { 
+                        label: 'Received', 
+                        data: received, 
+                        borderColor: chartColors.primary, 
+                        backgroundColor: receivedGradient,
+                        tension: 0.4, 
+                        fill: true,
+                        pointBackgroundColor: chartColors.primary,
+                        pointBorderColor: '#0a0e1a',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                    },
+                    { 
+                        label: 'Issued', 
+                        data: issued, 
+                        borderColor: chartColors.secondary, 
+                        backgroundColor: issuedGradient,
+                        tension: 0.4, 
+                        fill: true,
+                        pointBackgroundColor: chartColors.secondary,
+                        pointBorderColor: '#0a0e1a',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                    }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom' } },
+                plugins: { 
+                    legend: { 
+                        position: 'bottom',
+                        labels: {
+                            padding: 16,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 22, 41, 0.95)',
+                        borderColor: 'rgba(0, 212, 255, 0.3)',
+                        borderWidth: 1,
+                        padding: 12,
+                        cornerRadius: 8,
+                    }
+                },
                 scales: {
-                    x: { grid: { display: false } },
-                    y: { beginAtZero: true, grid: { color: '#eee' } }
+                    x: { 
+                        grid: { display: false },
+                        ticks: { font: { size: 11 } }
+                    },
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: 'rgba(255,255,255,0.04)' },
+                        ticks: { font: { size: 11 } }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
                 }
             }
         });
@@ -521,20 +2015,57 @@ ${st === 'ok' ? 'In stock' : st === 'low' ? 'Low' : 'Out'}
 // Top items by value
         const topItems = buildTopValue(filtered, 6);
         if (topValueChart) topValueChart.destroy();
-        topValueChart = new Chart(document.getElementById('topValueChart'), {
+        
+        const topCtx = document.getElementById('topValueChart').getContext('2d');
+        const topGradient = topCtx.createLinearGradient(0, 0, 300, 0);
+        topGradient.addColorStop(0, chartColors.gradient2);
+        topGradient.addColorStop(1, chartColors.gradient1);
+
+        topValueChart = new Chart(topCtx, {
             type: 'bar',
             data: {
-                labels: topItems.map(t => t.name),
-                datasets: [{ label: 'Total value', data: topItems.map(t => t.value), backgroundColor: '#1d4ed8' }]
+                labels: topItems.map(t => t.name.length > 20 ? t.name.slice(0, 20) + '...' : t.name),
+                datasets: [{ 
+                    label: 'Total Value', 
+                    data: topItems.map(t => t.value), 
+                    backgroundColor: topGradient,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
             },
             options: {
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 22, 41, 0.95)',
+                        borderColor: 'rgba(0, 212, 255, 0.3)',
+                        borderWidth: 1,
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: (ctx) => `Value: ${fmtCurrency(ctx.raw)}`
+                        }
+                    }
+                },
                 scales: {
-                    x: { grid: { color: '#eee' } },
-                    y: { grid: { display: false } }
+                    x: { 
+                        grid: { color: 'rgba(255,255,255,0.04)' },
+                        ticks: { 
+                            font: { size: 11 },
+                            callback: (v) => '$' + v
+                        }
+                    },
+                    y: { 
+                        grid: { display: false },
+                        ticks: { font: { size: 11 } }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
                 }
             }
         });
@@ -572,7 +2103,7 @@ ${st === 'ok' ? 'In stock' : st === 'low' ? 'Low' : 'Out'}
 
     // --- Events ---
     function bindEvents() {
-        searchInput.addEventListener('input', applyFilters);
+        searchInput.addEventListener('input', debounce(applyFilters, 200));
         categoryFilter.addEventListener('change', applyFilters);
         statusFilter.addEventListener('change', applyFilters);
         supplierFilter.addEventListener('change', applyFilters);
@@ -594,37 +2125,632 @@ ${st === 'ok' ? 'In stock' : st === 'low' ? 'Low' : 'Out'}
         });
 
 // Export CSV
-        btnExport.addEventListener('click', () => {
+        btnExport.addEventListener('click', () => exportCSV(filtered));
+
+        // Add item - opens modal
+        btnAdd.addEventListener('click', () => openAddModal());
+
+        // Navigation
+        document.querySelectorAll('[data-page]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = link.getAttribute('data-page');
+                navigateTo(page);
+            });
+        });
+
+        // Inventory page filters
+        const inventorySearch = document.getElementById('inventorySearch');
+        const inventoryCategoryFilter = document.getElementById('inventoryCategoryFilter');
+        const inventoryStatusFilter = document.getElementById('inventoryStatusFilter');
+        const inventorySupplierFilter = document.getElementById('inventorySupplierFilter');
+        const inventoryResetFilters = document.getElementById('inventoryResetFilters');
+        const btnAddInventory = document.getElementById('btnAddInventory');
+
+        if (inventorySearch) {
+            inventorySearch.addEventListener('input', debounce(renderFullInventory, 200));
+        }
+        if (inventoryCategoryFilter) {
+            inventoryCategoryFilter.addEventListener('change', renderFullInventory);
+        }
+        if (inventoryStatusFilter) {
+            inventoryStatusFilter.addEventListener('change', renderFullInventory);
+        }
+        if (inventorySupplierFilter) {
+            inventorySupplierFilter.addEventListener('change', renderFullInventory);
+        }
+        if (inventoryResetFilters) {
+            inventoryResetFilters.addEventListener('click', () => {
+                inventorySearch.value = '';
+                inventoryCategoryFilter.value = '';
+                inventoryStatusFilter.value = '';
+                inventorySupplierFilter.value = '';
+                renderFullInventory();
+            });
+        }
+        if (btnAddInventory) {
+            btnAddInventory.addEventListener('click', () => openAddModal());
+        }
+
+        // Settings threshold change
+        const thresholdInput = document.getElementById('lowStockThreshold');
+        if (thresholdInput) {
+            thresholdInput.addEventListener('change', (e) => {
+                LOW_THRESHOLD = parseInt(e.target.value) || 10;
+            });
+        }
+
+        // Close modal on overlay click
+        document.getElementById('itemModal').addEventListener('click', (e) => {
+            if (e.target.id === 'itemModal') closeModal();
+        });
+        document.getElementById('deleteModal').addEventListener('click', (e) => {
+            if (e.target.id === 'deleteModal') closeDeleteModal();
+        });
+
+        // Close modals on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeDeleteModal();
+            }
+        });
+    }
+
+    // Debounce utility
+    function debounce(fn, delay) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => fn.apply(this, args), delay);
+        };
+    }
+
+    // --- Navigation ---
+    let currentPage = 'dashboard';
+    const pageTitles = {
+        dashboard: 'Inventory Dashboard',
+        inventory: 'Inventory Management',
+        analytics: 'Analytics & Insights',
+        reports: 'Reports',
+        settings: 'Settings',
+        help: 'Help Center'
+    };
+
+    function navigateTo(page) {
+        currentPage = page;
+        
+        // Update active nav link
+        document.querySelectorAll('[data-page]').forEach(link => {
+            link.classList.toggle('active', link.getAttribute('data-page') === page);
+        });
+
+        // Show/hide pages
+        document.querySelectorAll('.page-view').forEach(view => {
+            view.classList.toggle('active', view.id === `page-${page}`);
+        });
+
+        // Update title
+        document.querySelector('.topbar .title').textContent = pageTitles[page] || 'Dashboard';
+        document.querySelector('.topbar .breadcrumb').textContent = `Home / ${pageTitles[page]}`;
+
+        // Page-specific initialization
+        if (page === 'inventory') {
+            initInventoryPage();
+        } else if (page === 'analytics') {
+            renderAnalytics();
+        }
+    }
+
+    // --- Full Inventory Page ---
+    function initInventoryPage() {
+        const categories = Array.from(new Set(items.map(i => i.category))).sort();
+        const suppliers = Array.from(new Set(items.map(i => i.supplier))).sort();
+        
+        const catFilter = document.getElementById('inventoryCategoryFilter');
+        const supFilter = document.getElementById('inventorySupplierFilter');
+        
+        if (catFilter) {
+            catFilter.innerHTML = '<option value="">All Categories</option>' + 
+                categories.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+        if (supFilter) {
+            supFilter.innerHTML = '<option value="">All Suppliers</option>' + 
+                suppliers.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+        
+        renderFullInventory();
+    }
+
+    function renderFullInventory() {
+        const search = document.getElementById('inventorySearch')?.value.toLowerCase() || '';
+        const cat = document.getElementById('inventoryCategoryFilter')?.value || '';
+        const status = document.getElementById('inventoryStatusFilter')?.value || '';
+        const sup = document.getElementById('inventorySupplierFilter')?.value || '';
+
+        const filteredItems = items.filter(item => {
+            const matchSearch = !search || 
+                item.sku.toLowerCase().includes(search) ||
+                item.name.toLowerCase().includes(search) ||
+                item.supplier.toLowerCase().includes(search);
+            const matchCat = !cat || item.category === cat;
+            const matchStatus = !status || statusOf(item.stock) === status;
+            const matchSup = !sup || item.supplier === sup;
+            return matchSearch && matchCat && matchStatus && matchSup;
+        });
+
+        const tbody = document.getElementById('fullInventoryBody');
+        if (!tbody) return;
+
+        tbody.innerHTML = '';
+        
+        if (filteredItems.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="empty-state">
+                        <i class="ti ti-package-off"></i>
+                        <h4>No items found</h4>
+                        <p>Try adjusting your filters or add a new item</p>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        filteredItems.forEach((item, idx) => {
+            const originalIndex = items.indexOf(item);
+            const totalValue = item.stock * item.unitPrice;
+            const itemStatus = getItemStatus(item);
+            const stClass = statusToClass(itemStatus);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="sku-cell">${item.sku}</td>
+                <td class="name-cell">${item.name}</td>
+                <td><span class="category-badge">${item.category}</span></td>
+                <td>${item.supplier}</td>
+                <td class="value-cell">${item.stock}</td>
+                <td class="value-cell">${fmtCurrency(item.unitPrice)}</td>
+                <td class="value-cell">${fmtCurrency(totalValue)}</td>
+                <td>
+                    <span class="status ${stClass}">
+                        ${stClass === 'ok' ? '<i class="ti ti-circle-check"></i>' : stClass === 'low' ? '<i class="ti ti-alert-triangle"></i>' : '<i class="ti ti-circle-off"></i>'}
+                        ${itemStatus}
+                    </span>
+                </td>
+                <td class="date-cell">${item.updated}</td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn-icon edit" onclick="openEditModal(${originalIndex})" title="Edit">
+                            <i class="ti ti-edit"></i>
+                        </button>
+                        <button class="btn-icon delete" onclick="openDeleteModal(${originalIndex})" title="Delete">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // --- Modal Functions ---
+    let deleteIndex = -1;
+
+    function openAddModal() {
+        document.getElementById('modalTitle').textContent = 'Add New Item';
+        document.getElementById('saveButtonText').textContent = 'Add Item';
+        document.getElementById('editIndex').value = -1;
+        document.getElementById('itemForm').reset();
+        document.getElementById('itemStatus').value = 'auto'; // Default to auto
+        document.getElementById('itemModal').classList.add('active');
+    }
+
+    function openEditModal(index) {
+        const item = items[index];
+        if (!item) return;
+
+        document.getElementById('modalTitle').textContent = 'Edit Item';
+        document.getElementById('saveButtonText').textContent = 'Save Changes';
+        document.getElementById('editIndex').value = index;
+        
+        document.getElementById('itemSku').value = item.sku;
+        document.getElementById('itemName').value = item.name;
+        document.getElementById('itemCategory').value = item.category;
+        document.getElementById('itemSupplier').value = item.supplier;
+        document.getElementById('itemStock').value = item.stock;
+        document.getElementById('itemPrice').value = item.unitPrice;
+        
+        // Set status dropdown - check if item has a manual status
+        const statusSelect = document.getElementById('itemStatus');
+        if (item.status && ['In Stock', 'Low Stock', 'Out of Stock'].includes(item.status)) {
+            statusSelect.value = item.status;
+        } else {
+            statusSelect.value = 'auto';
+        }
+
+        document.getElementById('itemModal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('itemModal').classList.remove('active');
+    }
+
+    async function saveItem() {
+        const form = document.getElementById('itemForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const index = parseInt(document.getElementById('editIndex').value);
+        const statusValue = document.getElementById('itemStatus').value;
+        const stockValue = parseInt(document.getElementById('itemStock').value) || 0;
+        
+        // Determine status - auto or manual
+        let finalStatus;
+        if (statusValue === 'auto') {
+            // Auto-calculate based on stock
+            if (stockValue <= 0) finalStatus = 'Out of Stock';
+            else if (stockValue <= LOW_THRESHOLD) finalStatus = 'Low Stock';
+            else finalStatus = 'In Stock';
+        } else {
+            finalStatus = statusValue;
+        }
+        
+        const newItem = {
+            sku: document.getElementById('itemSku').value.trim(),
+            name: document.getElementById('itemName').value.trim(),
+            category: document.getElementById('itemCategory').value,
+            supplier: document.getElementById('itemSupplier').value.trim(),
+            stock: stockValue,
+            unitPrice: parseFloat(document.getElementById('itemPrice').value) || 0,
+            status: finalStatus,
+            updated: new Date().toISOString().slice(0, 10)
+        };
+
+        const btn = document.querySelector('.modal-footer .btn.primary');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="ti ti-loader-2 spin"></i> Saving...';
+        btn.disabled = true;
+
+        if (isApiConnected) {
+            let result;
+            if (index >= 0) {
+                // Edit existing - use item's ID
+                const itemId = items[index].id;
+                result = await updateItemInAPI(itemId, newItem);
+            } else {
+                // Add new
+                result = await addItemToAPI(newItem);
+            }
+
+            if (result.success) {
+                // Refresh data from API
+                await fetchItems();
+                closeModal();
+                initFilters();
+                applyFilters();
+                
+                if (currentPage === 'inventory') {
+                    initInventoryPage();
+                }
+
+                btn.innerHTML = '<i class="ti ti-check"></i> Saved!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 1000);
+            } else {
+                alert('Error: ' + result.error);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        } else {
+            // Offline mode - save locally
+            if (index >= 0) {
+                items[index] = { ...items[index], ...newItem };
+            } else {
+                newItem.id = Date.now(); // Generate temporary ID
+                items.unshift(newItem);
+            }
+
+            closeModal();
+            initFilters();
+            applyFilters();
+            
+            if (currentPage === 'inventory') {
+                initInventoryPage();
+            }
+
+            btn.innerHTML = '<i class="ti ti-check"></i> Saved (Offline)!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 1000);
+        }
+    }
+
+    function openDeleteModal(index) {
+        deleteIndex = index;
+        const item = items[index];
+        if (!item) return;
+
+        document.getElementById('deleteItemName').textContent = `"${item.name}" (${item.sku})`;
+        document.getElementById('deleteModal').classList.add('active');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('active');
+        deleteIndex = -1;
+    }
+
+    async function confirmDelete() {
+        if (deleteIndex >= 0 && deleteIndex < items.length) {
+            const item = items[deleteIndex];
+            
+            if (isApiConnected && item.id) {
+                const result = await deleteItemFromAPI(item.id);
+                if (result.success) {
+                    await fetchItems();
+                } else {
+                    alert('Error deleting item: ' + result.error);
+                    closeDeleteModal();
+                    return;
+                }
+            } else {
+                // Offline mode
+                items.splice(deleteIndex, 1);
+            }
+            
+            initFilters();
+            applyFilters();
+            
+            if (currentPage === 'inventory') {
+                initInventoryPage();
+            }
+        }
+        closeDeleteModal();
+    }
+
+    // --- Export Functions ---
+    function exportCSV(data) {
             const rows = [
                 ['SKU','Name','Category','Supplier','Stock','Unit Price','Total Value','Status','Updated'],
-                ...filtered.map(i => [
+            ...data.map(i => [
                     i.sku, i.name, i.category, i.supplier, i.stock, i.unitPrice,
                     (i.stock * i.unitPrice).toFixed(2), statusOf(i.stock), i.updated
                 ])
             ];
             const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        downloadFile(csv, 'inventory_export.csv', 'text/csv;charset=utf-8;');
+        
+        // Visual feedback
+        btnExport.innerHTML = '<i class="ti ti-check"></i>Exported!';
+        setTimeout(() => {
+            btnExport.innerHTML = '<i class="ti ti-file-export"></i>Export';
+        }, 2000);
+    }
+
+    function downloadFile(content, filename, type) {
+        const blob = new Blob([content], { type });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; a.download = 'inventory_export.csv';
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
             URL.revokeObjectURL(url);
-        });
+    }
 
-// Add item (demo)
-        btnAdd.addEventListener('click', () => {
-            const sku = 'SKU-' + Math.floor(1000 + Math.random()*9000);
-            const demo = { sku, name: 'New Item ' + Math.floor(Math.random()*100), category: 'Supplies', supplier: 'DemoSupplier', stock: Math.floor(Math.random()*50), unitPrice: +(Math.random()*50).toFixed(2), updated: new Date().toISOString().slice(0,10) };
-            items.push(demo);
+    function generateReport(type) {
+        let data, filename;
+        
+        switch(type) {
+            case 'inventory':
+                data = items;
+                filename = 'full_inventory_report.csv';
+                break;
+            case 'lowstock':
+                data = items.filter(i => statusOf(i.stock) !== 'ok');
+                filename = 'low_stock_report.csv';
+                break;
+            case 'value':
+                data = [...items].sort((a, b) => (b.stock * b.unitPrice) - (a.stock * a.unitPrice));
+                filename = 'inventory_value_report.csv';
+                break;
+            default:
+                return;
+        }
+
+        const rows = [
+            ['SKU','Name','Category','Supplier','Stock','Unit Price','Total Value','Status','Updated'],
+            ...data.map(i => [
+                i.sku, i.name, i.category, i.supplier, i.stock, i.unitPrice,
+                (i.stock * i.unitPrice).toFixed(2), statusOf(i.stock), i.updated
+            ])
+        ];
+        const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+        downloadFile(csv, filename, 'text/csv;charset=utf-8;');
+        
+        alert(`Report downloaded: ${filename}`);
+    }
+
+    // --- Settings Functions ---
+    function exportAllData() {
+        exportCSV(items);
+    }
+
+    async function clearAllData() {
+        if (confirm('Are you sure you want to clear ALL inventory data? This cannot be undone!')) {
+            if (isApiConnected) {
+                // Delete all items from API
+                for (const item of items) {
+                    if (item.id) {
+                        await deleteItemFromAPI(item.id);
+                    }
+                }
+                await fetchItems();
+            } else {
+                items = [];
+            }
             initFilters();
             applyFilters();
+            if (currentPage === 'inventory') {
+                initInventoryPage();
+            }
+            alert('All data has been cleared.');
+        }
+    }
+
+    // Function to seed sample data to database
+    async function seedSampleData() {
+        if (!isApiConnected) {
+            alert('Cannot seed data: API not connected. Make sure the Flask server is running.');
+            return;
+        }
+        
+        if (!confirm('This will add 15 sample items to your database. Continue?')) {
+            return;
+        }
+        
+        const sampleData = getSampleData();
+        let added = 0;
+        
+        for (const item of sampleData) {
+            const result = await addItemToAPI(item);
+            if (result.success) added++;
+        }
+        
+        await fetchItems();
+        initFilters();
+        applyFilters();
+        if (currentPage === 'inventory') {
+            initInventoryPage();
+        }
+        alert(`Successfully added ${added} sample items to database!`);
+    }
+
+    // Refresh data from database
+    async function refreshData() {
+        await fetchItems();
+        initFilters();
+        applyFilters();
+        if (currentPage === 'inventory') {
+            initInventoryPage();
+        }
+        alert(isApiConnected ? 'Data refreshed from database!' : 'API not connected. Using local data.');
+    }
+
+    function saveSettings() {
+        const threshold = document.getElementById('lowStockThreshold').value;
+        LOW_THRESHOLD = parseInt(threshold) || 10;
+        
+        // Refresh displays
+        applyFilters();
+        if (currentPage === 'inventory') {
+            renderFullInventory();
+        }
+        
+        alert('Settings saved successfully!');
+    }
+
+    // --- Analytics ---
+    let analyticsCategoryChart, analyticsSupplierChart;
+
+    function renderAnalytics() {
+        // Update KPIs
+        document.getElementById('analyticsTotalSKU').textContent = items.length;
+        document.getElementById('analyticsCategories').textContent = new Set(items.map(i => i.category)).size;
+        document.getElementById('analyticsSuppliers').textContent = new Set(items.map(i => i.supplier)).size;
+        document.getElementById('analyticsLowStock').textContent = items.filter(i => statusOf(i.stock) !== 'ok').length;
+
+        // Category Pie Chart
+        const catData = {};
+        items.forEach(i => {
+            catData[i.category] = (catData[i.category] || 0) + i.stock;
+        });
+
+        if (analyticsCategoryChart) analyticsCategoryChart.destroy();
+        analyticsCategoryChart = new Chart(document.getElementById('analyticsCategoryChart'), {
+            type: 'pie',
+            data: {
+                labels: Object.keys(catData),
+                datasets: [{
+                    data: Object.values(catData),
+                    backgroundColor: ['#00d4ff', '#7c3aed', '#10b981', '#f59e0b', '#ef4444'],
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
+
+        // Supplier Bar Chart
+        const supData = {};
+        items.forEach(i => {
+            supData[i.supplier] = (supData[i.supplier] || 0) + i.stock;
+        });
+
+        if (analyticsSupplierChart) analyticsSupplierChart.destroy();
+        const supCtx = document.getElementById('analyticsSupplierChart').getContext('2d');
+        const supGradient = supCtx.createLinearGradient(0, 0, 0, 300);
+        supGradient.addColorStop(0, 'rgba(0, 212, 255, 0.8)');
+        supGradient.addColorStop(1, 'rgba(124, 58, 237, 0.8)');
+
+        analyticsSupplierChart = new Chart(supCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(supData),
+                datasets: [{
+                    label: 'Stock Units',
+                    data: Object.values(supData),
+                    backgroundColor: supGradient,
+                    borderRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' } }
+                }
+            }
         });
     }
 
     // --- Init ---
-    initFilters();
-    bindEvents();
-    applyFilters();
+    async function init() {
+        // Try to fetch items from API
+        await fetchItems();
+        initFilters();
+        bindEvents();
+        applyFilters();
+        console.log('Dashboard initialized. API Connected:', isApiConnected);
+    }
+
+    // Start the application
+    init();
 </script>
+
+<style>
+    /* Loading spinner animation */
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .spin {
+        animation: spin 1s linear infinite;
+    }
+</style>
 </body>
 </html>
