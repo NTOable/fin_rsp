@@ -25,7 +25,7 @@ def insert_item():
     name = request.form.get("name")
     conn = db()
     cur = conn.cursor()
-    cur.execute("INSERT INTO items (name) VALUES (%s)", (name,))
+    cur.execute("INSERT INTO item_type (item_name) VALUES (%s)", (name))
     conn.commit()
     conn.close()
     return "OK"
