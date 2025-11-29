@@ -24,3 +24,17 @@ TABLES
         storage_id     INT REFERENCES Storage(storage_id)
         user_id        INT REFERENCES User(user_id)
         created_at     TIMESTAMP DEFAULT NOW()
+
+
+Features
+Filter System
+Add New Item (Change to Draft Dataset)
+
+Features not Implemented yet
+Admin Control (No Edit or Delete)
+
+To Do
+https://www.youtube.com/watch?v=M2NzvnfS-hI
+Download PostGreSQL 18, create database and table using draft above
+Figure out how to connect db using python (check intellij, already have scripts for this)
+Figure out how to save user input from UI into variables -> place variables into INSERT queries -> execute 
