@@ -18,19 +18,15 @@ def get_items():
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     cur.execute(""" SELECT item_id, item_name, quantity, type_name, storage_name, item.created_at FROM item
-                         LEFT JOIN Item_Type ON Item.type_id = Item_Type.type_id
-                         LEFT JOIN Storage ON Item.storage_id = Storage.storage_id
-                ORDER BY Item.item_id DESC;
+                         LEFT JOIN item_type ON item.type_id = item_type.type_id
+                         LEFT JOIN storage ON item.storage_id = storage.storage_id
+                ORDER BY item.item_id DESC;
                 """)
 
     rows = [dict(row) for row in cur.fetchall()]
     conn.close()
     return jsonify(rows)
 
-
-######################################
-# ADD NEW ITEM
-######################################
 @app.post("/items/add")
 def add_item():
     data = request.json
@@ -44,7 +40,7 @@ def add_item():
     cur = conn.cursor()
 
     cur.execute("""
-                INSERT INTO Item (item_name, quantity, type_id, storage_id, user_id)
+                INSERT INTO item (item_name, quantity, type_id, storage_id, user_id)
                 VALUES (%s, %s, %s, %s, %s)
                 """, (name, quantity, type_id, storage_id, user_id))
 
@@ -52,10 +48,6 @@ def add_item():
     conn.close()
     return jsonify({"status": "success"})
 
-
-######################################
-# UPDATE ITEM QUANTITY (+ / -)
-######################################
 @app.post("/items/update_quantity")
 def update_quantity():
     data = request.json
@@ -66,7 +58,7 @@ def update_quantity():
     cur = conn.cursor()
 
     cur.execute("""
-                UPDATE Item
+                UPDATE item
                 SET quantity = %s
                 WHERE item_id = %s
                 """, (new_qty, item_id))
@@ -75,10 +67,6 @@ def update_quantity():
     conn.close()
     return jsonify({"status": "updated"})
 
-
-######################################
-# DELETE ITEM
-######################################
 @app.post("/items/delete")
 def delete_item():
     data = request.json
@@ -87,7 +75,7 @@ def delete_item():
     conn = db()
     cur = conn.cursor()
 
-    cur.execute("DELETE FROM Item WHERE item_id = %s", (item_id,))
+    cur.execute("DELETE FROM item WHERE item_id = %s", (item_id,))
     conn.commit()
     conn.close()
 
@@ -99,7 +87,7 @@ def get_types():
     conn = db()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    cur.execute("SELECT * FROM Item_Type ORDER BY type_id ASC")
+    cur.execute("SELECT * FROM item_type ORDER BY type_id ASC")
     rows = [dict(row) for row in cur.fetchall()]
     conn.close()
 
@@ -111,7 +99,7 @@ def get_storage():
     conn = db()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    cur.execute("SELECT * FROM Storage ORDER BY storage_id ASC")
+    cur.execute("SELECT * FROM storage ORDER BY storage_id ASC")
     rows = [dict(row) for row in cur.fetchall()]
     conn.close()
 
