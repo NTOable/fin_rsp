@@ -1,12 +1,14 @@
 """
 Inventory Management System - Flask API
 Connects to PostgreSQL database for CRUD operations
+Converted to use psycopg (psycopg3) for Python 3.13 compatibility.
 """
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import psycopg2
-from psycopg2.extras import RealDictCursor
+import psycopg
+from psycopg.rows import dict_row
+from psycopg import errors
 from datetime import datetime
 from decimal import Decimal
 
@@ -25,9 +27,10 @@ DB_CONFIG = {
 def get_db_connection():
     """Create and return a database connection"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        # Note: psycopg.connect returns a connection object
+        conn = psycopg.connect(**DB_CONFIG)
         return conn
-    except psycopg2.Error as e:
+    except psycopg.Error as e:
         print(f"Database connection error: {e}")
         return None
 
@@ -35,6 +38,7 @@ def init_db():
     """Initialize the database table if it doesn't exist"""
     conn = get_db_connection()
     if conn:
+        cur = None
         try:
             cur = conn.cursor()
             cur.execute("""
@@ -57,10 +61,11 @@ def init_db():
             """)
             conn.commit()
             print("Database initialized successfully!")
-        except psycopg2.Error as e:
+        except psycopg.Error as e:
             print(f"Error initializing database: {e}")
         finally:
-            cur.close()
+            if cur:
+                cur.close()
             conn.close()
 
 def serialize_item(item):
@@ -68,14 +73,16 @@ def serialize_item(item):
     if item is None:
         return None
     
+    # item will already be a dict when using dict_row
     result = dict(item)
     # Convert Decimal to float for JSON serialization
-    if 'unit_price' in result and result['unit_price']:
+    if 'unit_price' in result and result['unit_price'] is not None:
         result['unit_price'] = float(result['unit_price'])
-    if 'total_revenue' in result and result['total_revenue']:
+    if 'total_revenue' in result and result['total_revenue'] is not None:
         result['total_revenue'] = float(result['total_revenue'])
     # Convert datetime to string
-    if 'updated_at' in result and result['updated_at']:
+    if 'updated_at' in result and result['updated_at'] is not None:
+        # Keep date-only format as before
         result['updated_at'] = result['updated_at'].strftime('%Y-%m-%d')
     return result
 
@@ -88,15 +95,17 @@ def get_items():
     if not conn:
         return jsonify({'error': 'Database connection failed'}), 500
     
+    cur = None
     try:
-        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur = conn.cursor(row_factory=dict_row)
         cur.execute("SELECT * FROM Item ORDER BY updated_at DESC")
         items = cur.fetchall()
         return jsonify([serialize_item(item) for item in items])
-    except psycopg2.Error as e:
+    except psycopg.Error as e:
         return jsonify({'error': str(e)}), 500
     finally:
-        cur.close()
+        if cur:
+            cur.close()
         conn.close()
 
 @app.route('/api/items/<int:item_id>', methods=['GET'])
@@ -106,17 +115,19 @@ def get_item(item_id):
     if not conn:
         return jsonify({'error': 'Database connection failed'}), 500
     
+    cur = None
     try:
-        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur = conn.cursor(row_factory=dict_row)
         cur.execute("SELECT * FROM Item WHERE id = %s", (item_id,))
         item = cur.fetchone()
         if item:
             return jsonify(serialize_item(item))
         return jsonify({'error': 'Item not found'}), 404
-    except psycopg2.Error as e:
+    except psycopg.Error as e:
         return jsonify({'error': str(e)}), 500
     finally:
-        cur.close()
+        if cur:
+            cur.close()
         conn.close()
 
 @app.route('/api/items', methods=['POST'])
@@ -134,8 +145,9 @@ def add_item():
     if not conn:
         return jsonify({'error': 'Database connection failed'}), 500
     
+    cur = None
     try:
-        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur = conn.cursor(row_factory=dict_row)
         
         # Calculate total_revenue (stock * unit_price)
         stock = data.get('stock', 0)
@@ -176,16 +188,16 @@ def add_item():
             'item': serialize_item(new_item)
         }), 201
         
-    except psycopg2.IntegrityError as e:
+    except errors.UniqueViolation as e:
+        # Unique constraint (SKU) violation
         conn.rollback()
-        if 'unique' in str(e).lower():
-            return jsonify({'error': 'SKU already exists'}), 409
-        return jsonify({'error': str(e)}), 400
-    except psycopg2.Error as e:
+        return jsonify({'error': 'SKU already exists'}), 409
+    except psycopg.DatabaseError as e:
         conn.rollback()
         return jsonify({'error': str(e)}), 500
     finally:
-        cur.close()
+        if cur:
+            cur.close()
         conn.close()
 
 @app.route('/api/items/<int:item_id>', methods=['PUT'])
@@ -197,8 +209,9 @@ def update_item(item_id):
     if not conn:
         return jsonify({'error': 'Database connection failed'}), 500
     
+    cur = None
     try:
-        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur = conn.cursor(row_factory=dict_row)
         
         # Check if item exists
         cur.execute("SELECT * FROM Item WHERE id = %s", (item_id,))
@@ -255,16 +268,15 @@ def update_item(item_id):
             'item': serialize_item(updated_item)
         })
         
-    except psycopg2.IntegrityError as e:
+    except errors.UniqueViolation as e:
         conn.rollback()
-        if 'unique' in str(e).lower():
-            return jsonify({'error': 'SKU already exists'}), 409
-        return jsonify({'error': str(e)}), 400
-    except psycopg2.Error as e:
+        return jsonify({'error': 'SKU already exists'}), 409
+    except psycopg.DatabaseError as e:
         conn.rollback()
         return jsonify({'error': str(e)}), 500
     finally:
-        cur.close()
+        if cur:
+            cur.close()
         conn.close()
 
 @app.route('/api/items/<int:item_id>', methods=['DELETE'])
@@ -274,8 +286,9 @@ def delete_item(item_id):
     if not conn:
         return jsonify({'error': 'Database connection failed'}), 500
     
+    cur = None
     try:
-        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur = conn.cursor(row_factory=dict_row)
         
         # Check if item exists
         cur.execute("SELECT * FROM Item WHERE id = %s", (item_id,))
@@ -291,11 +304,12 @@ def delete_item(item_id):
             'item': serialize_item(item)
         })
         
-    except psycopg2.Error as e:
+    except psycopg.DatabaseError as e:
         conn.rollback()
         return jsonify({'error': str(e)}), 500
     finally:
-        cur.close()
+        if cur:
+            cur.close()
         conn.close()
 
 @app.route('/api/items/bulk', methods=['POST'])
@@ -310,8 +324,9 @@ def add_bulk_items():
     if not conn:
         return jsonify({'error': 'Database connection failed'}), 500
     
+    cur = None
     try:
-        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur = conn.cursor(row_factory=dict_row)
         added_items = []
         errors = []
         
@@ -355,11 +370,12 @@ def add_bulk_items():
             'errors': errors
         }), 201
         
-    except psycopg2.Error as e:
+    except psycopg.DatabaseError as e:
         conn.rollback()
         return jsonify({'error': str(e)}), 500
     finally:
-        cur.close()
+        if cur:
+            cur.close()
         conn.close()
 
 @app.route('/api/stats', methods=['GET'])
@@ -369,8 +385,9 @@ def get_stats():
     if not conn:
         return jsonify({'error': 'Database connection failed'}), 500
     
+    cur = None
     try:
-        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur = conn.cursor(row_factory=dict_row)
         
         # Total items
         cur.execute("SELECT COUNT(*) as total FROM Item")
@@ -408,10 +425,11 @@ def get_stats():
             'suppliers_count': suppliers_count
         })
         
-    except psycopg2.Error as e:
+    except psycopg.DatabaseError as e:
         return jsonify({'error': str(e)}), 500
     finally:
-        cur.close()
+        if cur:
+            cur.close()
         conn.close()
 
 @app.route('/api/health', methods=['GET'])
@@ -454,4 +472,3 @@ if __name__ == '__main__':
     init_db()
     print("Starting Flask server on http://localhost:5001")
     app.run(debug=True, host='0.0.0.0', port=5001)
-
